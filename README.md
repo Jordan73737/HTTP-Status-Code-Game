@@ -22,8 +22,8 @@ Both timers are easy to tweak in `frontend/src/renderer/src/state.ts` under `TIM
 |-----|--------|
 | Type + auto-match | Submits when what you've typed equals the current code |
 | `Enter` | Manual submit |
-| `Space` | Skip to next code |
-| `Tab` | Give up and see your results |
+| `Tab` | Skip to next code |
+| `Space` | Give up and see your results |
 | `Esc` | Quit |
 
 ---

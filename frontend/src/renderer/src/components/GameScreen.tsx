@@ -29,14 +29,11 @@ export default function GameScreen({
   useEffect(() => { inputRef.current?.focus() }, [state.currentIndex])
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === ' ') {
-      e.preventDefault()
-      onSkip()
-    }
     if (e.key === 'Enter') {
       e.preventDefault()
       onCheck()
     }
+    // Space and Tab are handled globally in App.tsx
   }
 
   const currentCode = state.codes[state.currentIndex]
@@ -138,9 +135,9 @@ export default function GameScreen({
       {/* ── Bottom legend ── */}
       <footer className="game-legend">
         <span className="legend-item"><kbd>Esc</kbd> Quit</span>
-        <span className="legend-item"><kbd>Space</kbd> Skip</span>
+        <span className="legend-item"><kbd>Tab</kbd> Skip</span>
         <span className="legend-item"><kbd>Enter</kbd> Check answer</span>
-        <span className="legend-item"><kbd>Tab</kbd> Give up &amp; see results</span>
+        <span className="legend-item"><kbd>Space</kbd> Give up &amp; see results</span>
         <span className="legend-timer">⏱ {state.timeLeft}s</span>
       </footer>
     </div>

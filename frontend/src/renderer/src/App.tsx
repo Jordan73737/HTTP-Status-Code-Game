@@ -21,12 +21,16 @@ export default function App() {
     }
   }, [state.screen])
 
-  // Tab = give up (capture phase so it fires before browser focus-move)
-  // Esc = quit app (global, works from any screen during game)
+  // Tab = skip, Space = give up, Esc = quit (all capture-phase so they fire before browser defaults)
   useEffect(() => {
     if (state.screen !== 'game') return
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Tab') {
+        e.preventDefault()
+        dispatch({ type: 'SKIP' })
+        setInputValue('')
+      }
+      if (e.key === ' ') {
         e.preventDefault()
         dispatch({ type: 'GIVE_UP' })
       }
