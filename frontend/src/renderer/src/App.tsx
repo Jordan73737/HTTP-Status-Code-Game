@@ -3,11 +3,16 @@ import { reducer, initialState } from './state'
 import StartScreen from './components/StartScreen'
 import GameScreen from './components/GameScreen'
 import ResultsScreen from './components/ResultsScreen'
+import CodesListScreen from './components/CodesListScreen'
+import CodeDetailScreen from './components/CodeDetailScreen'
+
+type InfoView = { screen: 'list' } | { screen: 'detail'; code: number } | null
 
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [inputValue, setInputValue] = useState('')
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [infoView, setInfoView] = useState<InfoView>(null)
 
   // Manage timer: start when game begins, clear on any screen change
   useEffect(() => {
@@ -75,7 +80,24 @@ export default function App() {
   }
 
   if (state.screen === 'start') {
-    return <StartScreen onStart={mode => dispatch({ type: 'START', mode })} />
+    if (infoView?.screen === 'list') {
+      return (
+        <CodesListScreen
+          onSelectCode={code => setInfoView({ screen: 'detail', code })}
+          onBack={() => setInfoView(null)}
+        />
+      )
+    }
+    if (infoView?.screen === 'detail') {
+      return (
+        <CodeDetailScreen
+          code={infoView.code}
+          onBack={() => setInfoView({ screen: 'list' })}
+          onSelectCode={code => setInfoView({ screen: 'detail', code })}
+        />
+      )
+    }
+    return <StartScreen onStart={mode => dispatch({ type: 'START', mode })} onViewCodes={() => setInfoView({ screen: 'list' })} />
   }
 
   if (state.screen === 'results') {

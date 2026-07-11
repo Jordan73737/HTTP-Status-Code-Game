@@ -100,7 +100,208 @@ kbd {
 .mode-card-count { font-size: 13px; color: var(--blue); }
 .mode-card-timer { font-size: 12px; color: var(--text-muted); }
 
-.start-hint { font-size: 13px; color: var(--text-muted); }
+.codes-ref-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  padding: 8px 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.codes-ref-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+/* ── Shared back button ── */
+.back-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.back-btn:hover { border-color: var(--text-muted); color: var(--text); }
+
+/* ── Codes List Screen ── */
+.cl-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cl-header {
+  padding: 16px 24px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cl-title { font-size: 20px; font-weight: 700; }
+.cl-subtitle { font-size: 13px; color: var(--text-muted); }
+
+.cl-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.cl-group-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.cl-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.cl-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+  border-left: 3px solid var(--card-accent, var(--border));
+}
+
+.cl-card:hover { background: var(--surface2); border-color: var(--card-accent, var(--border)); }
+
+.cl-card-code {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--card-accent, var(--text));
+  font-variant-numeric: tabular-nums;
+}
+
+.cl-card-title {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* ── Code Detail Screen ── */
+.cd-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cd-nav-btns { display: flex; gap: 8px; }
+
+.cd-nav-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.cd-nav-btn:hover { border-color: var(--text-muted); color: var(--text); }
+
+.cd-card {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 48px;
+  gap: 20px;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.cd-code-badge {
+  font-size: 56px;
+  font-weight: 900;
+  border: 3px solid;
+  border-radius: 16px;
+  padding: 8px 24px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px;
+}
+
+.cd-title {
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cd-divider {
+  width: 48px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.cd-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cd-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+
+.cd-section-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.cd-footer-nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.cd-footer-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+.cd-footer-btn:hover { color: var(--text); background: var(--surface2); }
 
 /* ── Game Screen ── */
 .game-screen {

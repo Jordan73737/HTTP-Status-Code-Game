@@ -4,9 +4,10 @@ import { COMMON_CODES, ALL_CODES } from '../statusCodes'
 
 interface Props {
   onStart: (mode: Mode) => void
+  onViewCodes: () => void
 }
 
-export default function StartScreen({ onStart }: Props) {
+export default function StartScreen({ onStart, onViewCodes }: Props) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Enter') onStart('common')
@@ -35,6 +36,9 @@ export default function StartScreen({ onStart }: Props) {
             <div className="mode-card-timer">45 s per code</div>
           </button>
         </div>
+        <button className="codes-ref-btn" onClick={onViewCodes}>
+          HTTP Codes Reference →
+        </button>
         <p className="start-hint">Press <kbd>Enter</kbd> to start Common · <kbd>Esc</kbd> to quit</p>
       </div>
     </div>
