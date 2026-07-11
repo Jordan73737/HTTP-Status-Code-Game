@@ -37,7 +37,7 @@ export default function StartScreen({ onStart, onViewCodes }: Props) {
           </button>
         </div>
         <button className="codes-ref-btn" onClick={onViewCodes}>
-          HTTP Codes Reference →
+          HTTP Codes Revision →
         </button>
         <p className="start-hint">Press <kbd>Enter</kbd> to start Common · <kbd>Esc</kbd> to quit</p>
       </div>
