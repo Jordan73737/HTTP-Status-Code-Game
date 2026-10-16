@@ -2,6 +2,10 @@
 
 A desktop quiz app for learning HTTP status codes. Built with Electron + React + TypeScript.
 
+## Download for Windows
+
+Windows users can [download the latest installer](https://github.com/Jordan73737/HTTP-Status-Code-Game/releases/latest/download/HTTP-Code-Game-Setup.exe). Run the downloaded `.exe` and follow the installation steps. The installer adds HTTP Code Game to the Start Menu and creates a desktop shortcut.
+
 You see the status code title (e.g. "Not Found") and have to type the numeric code (e.g. `404`) before the timer runs out. There's a reference table on the right with all the codes — but the numbers are blurred until you guess them, so it's actually a quiz and not just a cheat sheet.
 
 ---
@@ -51,6 +55,15 @@ To build a Windows installer:
 ```bash
 npm run package
 ```
+
+The installer is written to `frontend/dist/`. To publish a new installer on GitHub, create and push a version tag from the repository root:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+GitHub Actions will build the installer and attach it to a new GitHub Release. Update the tag for each subsequent release, such as `v0.1.1`.
 
 ---
 

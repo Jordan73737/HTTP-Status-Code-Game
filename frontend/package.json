@@ -15,6 +15,12 @@
     "win": {
       "target": "nsis"
     },
+    "nsis": {
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "HTTP Code Game"
+    },
+    "artifactName": "HTTP-Code-Game-Setup.${ext}",
     "files": ["out/**/*"]
   },
   "dependencies": {
