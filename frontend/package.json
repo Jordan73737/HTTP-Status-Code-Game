@@ -7,7 +7,8 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
-    "package": "electron-vite build && electron-builder --win"
+    "package": "electron-vite build && electron-builder --win",
+    "test": "vitest --run"
   },
   "build": {
     "appId": "com.httpcodegame",
@@ -21,7 +22,9 @@
       "shortcutName": "HTTP Code Game"
     },
     "artifactName": "HTTP-Code-Game-Setup.${ext}",
-    "files": ["out/**/*"]
+    "files": [
+      "out/**/*"
+    ]
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -35,6 +38,7 @@
     "electron": "^31.3.1",
     "electron-builder": "^24.13.3",
     "electron-vite": "^2.3.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "vitest": "^1.6.0"
   }
 }

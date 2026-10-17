@@ -1,4 +1,4 @@
-import { COMMON_CODES, ALL_CODES, StatusCode } from './statusCodes'
+import { COMMON_CODES, ALL_CODES, shuffleStatusCodes, StatusCode } from './statusCodes'
 
 export type Screen = 'start' | 'game' | 'results'
 export type Mode = 'common' | 'complete'
@@ -41,7 +41,8 @@ export type Action =
 export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
     case 'START': {
-      const codes = action.mode === 'common' ? COMMON_CODES : ALL_CODES
+      const baseCodes = action.mode === 'common' ? COMMON_CODES : ALL_CODES
+      const codes = shuffleStatusCodes(baseCodes)
       return {
         screen: 'game',
         mode: action.mode,
