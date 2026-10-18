@@ -128,7 +128,7 @@ export const ALL_CODES: StatusCode[] = [
     usedFor: 'Originally forced proxy use; deprecated in HTTP/1.1 due to security concerns.',
   },
   {
-    code: 306, title: '(Unused)',
+    code: 306, title: 'Switch Proxy / UNUSED',
     summary: 'This code is no longer used and is reserved.',
     example: 'Never seen in practice — it was briefly "Switch Proxy" in an early HTTP/1.1 draft.',
     usedFor: 'Reserved; has no current function.',
@@ -224,7 +224,7 @@ export const ALL_CODES: StatusCode[] = [
     usedFor: 'Conditional requests to prevent accidental overwrites — part of optimistic concurrency control.',
   },
   {
-    code: 413, title: 'Content Too Large',
+    code: 413, title: 'Content/Payload Too Large',
     summary: 'The request body is larger than the server is willing to process.',
     example: 'Uploading a 50 MB image when the server only accepts files up to 10 MB.',
     usedFor: 'Protects servers from oversized payloads; response may include a Retry-After header.',
