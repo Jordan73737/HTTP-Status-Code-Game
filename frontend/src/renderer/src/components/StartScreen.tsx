@@ -28,12 +28,12 @@ export default function StartScreen({ onStart, onViewCodes }: Props) {
           <button className="mode-card" onClick={() => onStart('common')}>
             <div className="mode-card-label">Common Codes</div>
             <div className="mode-card-count">{COMMON_CODES.length} codes</div>
-            <div className="mode-card-timer">15 s per code</div>
+            <div className="mode-card-timer">1:00 round</div>
           </button>
           <button className="mode-card" onClick={() => onStart('complete')}>
             <div className="mode-card-label">Complete List</div>
             <div className="mode-card-count">{ALL_CODES.length} codes</div>
-            <div className="mode-card-timer">45 s per code</div>
+            <div className="mode-card-timer">2:00 round</div>
           </button>
         </div>
         <button className="codes-ref-btn" onClick={onViewCodes}>

@@ -14,38 +14,54 @@ export default function App() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const [infoView, setInfoView] = useState<InfoView>(null)
 
-  // Manage timer: start when game begins, clear on any screen change
+  // Manage timer: start when game begins and pause when requested
   useEffect(() => {
     if (timerRef.current) clearInterval(timerRef.current)
     timerRef.current = null
-    if (state.screen === 'game') {
+    if (state.screen === 'game' && !state.isPaused) {
       timerRef.current = setInterval(() => dispatch({ type: 'TICK' }), 1000)
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
     }
-  }, [state.screen])
+  }, [state.screen, state.isPaused])
 
-  // Tab = skip, Space = give up, Esc = quit (all capture-phase so they fire before browser defaults)
+  // Tab = skip, P = pause, Space = give up, Esc = main menu or quit from the start screen
   useEffect(() => {
-    if (state.screen !== 'game') return
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Tab') {
+      if (state.screen === 'game') {
+        if (e.key === 'Tab') {
+          e.preventDefault()
+          dispatch({ type: 'SKIP' })
+          setInputValue('')
+        }
+        if (e.key.toLowerCase() === 'p') {
+          e.preventDefault()
+          dispatch({ type: 'TOGGLE_PAUSE' })
+        }
+        if (e.key === ' ') {
+          e.preventDefault()
+          dispatch({ type: 'GIVE_UP' })
+        }
+        if (e.key === 'Escape') {
+          e.preventDefault()
+          setInputValue('')
+          dispatch({ type: 'RESET' })
+        }
+      }
+      if (state.screen === 'results' && e.key === 'Escape') {
         e.preventDefault()
-        dispatch({ type: 'SKIP' })
         setInputValue('')
+        dispatch({ type: 'RESET' })
       }
-      if (e.key === ' ') {
+      if (state.screen === 'start' && infoView === null && e.key === 'Escape') {
         e.preventDefault()
-        dispatch({ type: 'GIVE_UP' })
-      }
-      if (e.key === 'Escape') {
         window.api?.quitApp()
       }
     }
     window.addEventListener('keydown', handler, { capture: true })
     return () => window.removeEventListener('keydown', handler, { capture: true })
-  }, [state.screen])
+  }, [state.screen, infoView])
 
   // Auto-submit as soon as the typed number matches the current code.
   // Also called manually via Enter key.
@@ -77,6 +93,10 @@ export default function App() {
   const handleSkip = () => {
     dispatch({ type: 'SKIP' })
     setInputValue('')
+  }
+
+  const handlePauseToggle = () => {
+    dispatch({ type: 'TOGGLE_PAUSE' })
   }
 
   if (state.screen === 'start') {
@@ -119,6 +139,7 @@ export default function App() {
       onSkip={handleSkip}
       onGiveUp={() => dispatch({ type: 'GIVE_UP' })}
       onJumpTo={code => dispatch({ type: 'JUMP_TO', code })}
+      onTogglePause={handlePauseToggle}
     />
   )
 }

@@ -1,6 +1,6 @@
 import { useRef, useEffect, KeyboardEvent } from 'react'
 import type { AppState } from '../state'
-import { TIME_PER_CODE } from '../state'
+import { ROUND_TIME_LIMIT } from '../state'
 
 const QUEUE_WINDOW = 14 // how many upcoming items to show in the conveyor belt
 
@@ -12,6 +12,7 @@ interface Props {
   onSkip: () => void
   onGiveUp: () => void
   onJumpTo: (code: number) => void
+  onTogglePause: () => void
 }
 
 export default function GameScreen({
@@ -22,6 +23,7 @@ export default function GameScreen({
   onSkip,
   onGiveUp,
   onJumpTo,
+  onTogglePause,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -37,7 +39,7 @@ export default function GameScreen({
   }
 
   const currentCode = state.codes[state.currentIndex]
-  const maxTime = TIME_PER_CODE[state.mode]
+  const maxTime = ROUND_TIME_LIMIT[state.mode]
   const timerPct = (state.timeLeft / maxTime) * 100
   const timerClass =
     timerPct < 30 ? 'timer-fill timer-fill--red'
@@ -73,10 +75,11 @@ export default function GameScreen({
             className="code-input"
             type="text"
             inputMode="numeric"
-            placeholder="e.g. 404"
-            value={inputValue}
+            placeholder={state.isPaused ? 'Paused' : 'e.g. 404'}
+            value={state.isPaused ? '' : inputValue}
             onChange={e => onInputChange(e.target.value.replace(/\D/g, ''))}
             onKeyDown={handleKeyDown}
+            disabled={state.isPaused}
           />
           <div className="timer-track">
             <div className={timerClass} style={{ width: `${timerPct}%` }} />
@@ -132,9 +135,19 @@ export default function GameScreen({
         </div>
       </div>
 
+      {state.isPaused && (
+        <div className="pause-overlay" onClick={onTogglePause}>
+          <div className="pause-card">
+            <div className="pause-title">Paused</div>
+            <div className="pause-subtitle">Press <kbd>P</kbd> to resume</div>
+          </div>
+        </div>
+      )}
+
       {/* ── Bottom legend ── */}
       <footer className="game-legend">
-        <span className="legend-item"><kbd>Esc</kbd> Quit</span>
+        <span className="legend-item"><kbd>Esc</kbd> Main menu</span>
+        <span className="legend-item"><kbd>P</kbd> {state.isPaused ? 'Resume' : 'Pause'}</span>
         <span className="legend-item"><kbd>Tab</kbd> Skip</span>
         <span className="legend-item"><kbd>Enter</kbd> Check answer</span>
         <span className="legend-item"><kbd>Space</kbd> Give up &amp; see results</span>
