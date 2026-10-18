@@ -23,8 +23,16 @@ function createWindow(): void {
 
   win.on('ready-to-show', () => win.show())
 
+  win.on('unresponsive', () => {
+    console.error('Window became unresponsive')
+  })
+
   win.webContents.on('render-process-gone', (_event, details) => {
     console.error('Renderer process gone:', details)
+  })
+
+  win.webContents.on('did-fail-load', (_event, errorCode, errorDescription) => {
+    console.error('Page failed to load:', errorCode, errorDescription)
   })
 
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -48,6 +56,10 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
+})
+
+process.on('uncaughtException', (err) => {
+  console.error('Main process uncaught exception:', err)
 })
 
 ipcMain.on('quit-app', () => app.quit())

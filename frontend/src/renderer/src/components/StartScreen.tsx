@@ -11,7 +11,7 @@ interface Props {
 export default function StartScreen({ onStart, onViewCodes }: Props) {
   const [selectedMode, setSelectedMode] = useState<Mode | null>(null)
   const [timerEnabled, setTimerEnabled] = useState(true)
-  const [customSeconds, setCustomSeconds] = useState(ROUND_TIME_LIMIT.common)
+  const [customSeconds, setCustomSeconds] = useState<number | ''>(ROUND_TIME_LIMIT.common)
 
   useEffect(() => {
     if (selectedMode) {
@@ -21,7 +21,8 @@ export default function StartScreen({ onStart, onViewCodes }: Props) {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && selectedMode) onStart(selectedMode, timerEnabled, timerEnabled ? customSeconds : undefined)
+      if (e.repeat) return // ignore OS key-repeat so a held key can't double-fire across a screen transition
+      if (e.key === 'Enter' && selectedMode) onStart(selectedMode, timerEnabled, timerEnabled ? Math.max(1, customSeconds || 1) : undefined)
       if (e.key === 'Escape') {
         if (selectedMode) {
           // Back out of the timer-selection sub-screen instead of quitting
@@ -41,7 +42,7 @@ export default function StartScreen({ onStart, onViewCodes }: Props) {
 
   const handleConfirmStart = () => {
     if (!selectedMode) return
-    onStart(selectedMode, timerEnabled, timerEnabled ? customSeconds : undefined)
+    onStart(selectedMode, timerEnabled, timerEnabled ? Math.max(1, customSeconds || 1) : undefined)
   }
 
   return (
@@ -82,14 +83,20 @@ export default function StartScreen({ onStart, onViewCodes }: Props) {
                   type="number"
                   min={1}
                   value={customSeconds}
-                  onChange={e => setCustomSeconds(Math.max(1, Number(e.target.value) || 1))}
+                  onChange={e => {
+                    const raw = e.target.value
+                    setCustomSeconds(raw === '' ? '' : Math.max(0, Number(raw)))
+                  }}
+                  onBlur={() => setCustomSeconds(prev => (prev === '' || prev < 1 ? 1 : prev))}
                 />
               </label>
             )}
 
-            <p className="timer-note">
-              Default timers: <strong>Common</strong> {ROUND_TIME_LIMIT.common}s · <strong>Complete</strong> {ROUND_TIME_LIMIT.complete}s
-            </p>
+            {timerEnabled && (
+              <p className="timer-note">
+                Default timers: <strong>Common</strong> {ROUND_TIME_LIMIT.common}s · <strong>Complete</strong> {ROUND_TIME_LIMIT.complete}s
+              </p>
+            )}
 
             <button className="start-quiz-btn" onClick={handleConfirmStart}>
               Start {selectedMode === 'common' ? 'Common' : 'Complete'} Quiz →

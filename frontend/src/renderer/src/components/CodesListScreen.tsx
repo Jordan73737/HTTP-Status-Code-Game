@@ -17,6 +17,7 @@ const GROUPS = [
 export default function CodesListScreen({ onSelectCode, onBack }: Props) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if (e.repeat) return
       if (e.key === 'Escape') onBack()
     }
     window.addEventListener('keydown', handler)

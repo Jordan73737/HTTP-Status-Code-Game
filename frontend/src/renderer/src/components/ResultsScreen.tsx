@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { AppState } from '../state'
 
 interface Props {
@@ -11,6 +12,15 @@ export default function ResultsScreen({ state, onPlayAgain, onMenu }: Props) {
   const correct = guessed.size
   const total = codes.length
   const pct = total > 0 ? Math.round((correct / total) * 100) : 0
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.repeat) return
+      if (e.key === 'Escape') onMenu()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onMenu])
 
   return (
     <div className="results-screen">

@@ -26,42 +26,6 @@ export default function App() {
     }
   }, [state.screen, state.isPaused, state.timerEnabled])
 
-  // Tab = skip, P = pause, Space = give up, Esc = back to the main menu unless already there
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (state.screen === 'game') {
-        if (e.key === 'Tab') {
-          e.preventDefault()
-          dispatch({ type: 'SKIP' })
-          setInputValue('')
-        }
-        if (e.key.toLowerCase() === 'p') {
-          e.preventDefault()
-          dispatch({ type: 'TOGGLE_PAUSE' })
-        }
-        if (e.key === ' ') {
-          e.preventDefault()
-          dispatch({ type: 'GIVE_UP' })
-        }
-        if (e.key === 'Escape') {
-          e.preventDefault()
-          setInputValue('')
-          dispatch({ type: 'RESET' })
-        }
-      }
-      if (state.screen === 'results' && e.key === 'Escape') {
-        e.preventDefault()
-        setInputValue('')
-        dispatch({ type: 'RESET' })
-      }
-      if (state.screen === 'start' && infoView === null && e.key === 'Escape') {
-        e.preventDefault()
-        window.api?.quitApp()
-      }
-    }
-    window.addEventListener('keydown', handler, { capture: true })
-    return () => window.removeEventListener('keydown', handler, { capture: true })
-  }, [state.screen, infoView])
 
   // Auto-submit as soon as the typed number matches the current code.
   // Also called manually via Enter key.
@@ -93,6 +57,11 @@ export default function App() {
   const handleSkip = () => {
     dispatch({ type: 'SKIP' })
     setInputValue('')
+  }
+
+  const handleMenu = () => {
+    setInputValue('')
+    dispatch({ type: 'RESET' })
   }
 
   const handleStart = (mode: 'common' | 'complete', timerEnabled: boolean, customSeconds?: number) => {
@@ -129,7 +98,7 @@ export default function App() {
       <ResultsScreen
         state={state}
         onPlayAgain={() => { setInputValue(''); dispatch({ type: 'START', mode: state.mode }) }}
-        onMenu={() => { setInputValue(''); dispatch({ type: 'RESET' }) }}
+        onMenu={handleMenu}
       />
     )
   }
@@ -144,6 +113,7 @@ export default function App() {
       onGiveUp={() => dispatch({ type: 'GIVE_UP' })}
       onJumpTo={code => dispatch({ type: 'JUMP_TO', code })}
       onTogglePause={handlePauseToggle}
+      onMenu={handleMenu}
     />
   )
 }

@@ -13,6 +13,7 @@ interface Props {
   onGiveUp: () => void
   onJumpTo: (code: number) => void
   onTogglePause: () => void
+  onMenu: () => void
 }
 
 export default function GameScreen({
@@ -24,18 +25,44 @@ export default function GameScreen({
   onGiveUp,
   onJumpTo,
   onTogglePause,
+  onMenu,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Focus input on mount and whenever currentIndex changes (after each correct answer)
   useEffect(() => { inputRef.current?.focus() }, [state.currentIndex])
 
+  // Tab = skip, P = pause, Space = give up, Esc = main menu — scoped to this screen's own lifetime
+  useEffect(() => {
+    const handler = (e: globalThis.KeyboardEvent) => {
+      if (e.repeat) return
+      if (e.key === 'Tab') {
+        e.preventDefault()
+        onSkip()
+      }
+      if (e.key.toLowerCase() === 'p') {
+        e.preventDefault()
+        onTogglePause()
+      }
+      if (e.key === ' ') {
+        e.preventDefault()
+        onGiveUp()
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        onMenu()
+      }
+    }
+    window.addEventListener('keydown', handler, { capture: true })
+    return () => window.removeEventListener('keydown', handler, { capture: true })
+  }, [onSkip, onTogglePause, onGiveUp, onMenu])
+
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault()
       onCheck()
     }
-    // Space and Tab are handled globally in App.tsx
+    // Space, Tab, P and Esc are handled by the window-level effect above
   }
 
   const currentCode = state.codes[state.currentIndex]

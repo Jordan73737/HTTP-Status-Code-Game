@@ -24,6 +24,7 @@ export default function CodeDetailScreen({ code, onBack, onSelectCode }: Props) 
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if (e.repeat) return
       if (e.key === 'Escape') onBack()
       if (e.key === 'ArrowLeft' && prev) onSelectCode(prev.code)
       if (e.key === 'ArrowRight' && next) onSelectCode(next.code)
