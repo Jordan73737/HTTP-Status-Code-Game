@@ -3,13 +3,11 @@ import { COMMON_CODES, ALL_CODES, shuffleStatusCodes, StatusCode } from './statu
 export type Screen = 'start' | 'game' | 'results'
 export type Mode = 'common' | 'complete'
 
-/** Round-based countdown settings for each mode */
+/** Total countdown (in seconds) allowed to answer every question in a mode */
 export const ROUND_TIME_LIMIT: Record<Mode, number> = {
   common: 60,
   complete: 180,
 }
-
-export const TIME_PER_CODE = ROUND_TIME_LIMIT
 
 export interface AppState {
   screen: Screen
@@ -22,6 +20,7 @@ export interface AppState {
   timeLimit: number
   timerEnabled: boolean
   isPaused: boolean
+  elapsedSeconds: number
 }
 
 export const initialState: AppState = {
@@ -35,6 +34,7 @@ export const initialState: AppState = {
   timeLimit: 0,
   timerEnabled: true,
   isPaused: false,
+  elapsedSeconds: 0,
 }
 
 export type Action =
@@ -65,14 +65,19 @@ export function reducer(state: AppState, action: Action): AppState {
         timeLimit,
         timerEnabled,
         isPaused: false,
+        elapsedSeconds: 0,
       }
     }
     case 'TICK': {
-      if (state.screen !== 'game' || state.isPaused || !state.timerEnabled) return state
-      if (state.timeLeft <= 1) {
-        return { ...state, timeLeft: 0, screen: 'results', isPaused: false }
+      if (state.screen !== 'game' || state.isPaused) return state
+      const elapsedSeconds = state.elapsedSeconds + 1
+      if (!state.timerEnabled) {
+        return { ...state, elapsedSeconds }
       }
-      return { ...state, timeLeft: state.timeLeft - 1 }
+      if (state.timeLeft <= 1) {
+        return { ...state, timeLeft: 0, elapsedSeconds, screen: 'results', isPaused: false }
+      }
+      return { ...state, timeLeft: state.timeLeft - 1, elapsedSeconds }
     }
     case 'CHECK': {
       if (state.screen !== 'game' || state.isPaused) return state
@@ -127,7 +132,6 @@ function advance(state: AppState, result: 'correct' | 'skip'): AppState {
     currentIndex: nextIndex,
     guessed: newGuessed,
     skipped: newSkipped,
-    timeLeft: state.timerEnabled ? state.timeLimit : 0,
     isPaused: false,
   }
 }

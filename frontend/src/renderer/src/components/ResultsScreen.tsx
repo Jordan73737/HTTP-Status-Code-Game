@@ -7,11 +7,18 @@ interface Props {
   onMenu: () => void
 }
 
+function formatDuration(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`
+}
+
 export default function ResultsScreen({ state, onPlayAgain, onMenu }: Props) {
-  const { codes, guessed, skipped } = state
+  const { codes, guessed, skipped, elapsedSeconds, timerEnabled, timeLeft } = state
   const correct = guessed.size
   const total = codes.length
   const pct = total > 0 ? Math.round((correct / total) * 100) : 0
+  const timedOut = timerEnabled && timeLeft <= 0 && guessed.size + skipped.size < total
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -32,6 +39,11 @@ export default function ResultsScreen({ state, onPlayAgain, onMenu }: Props) {
           <span className="results-sep">/ {total}</span>
           <span className="results-pct">{pct}%</span>
         </div>
+
+        <p className="results-time">
+          ⏱ Time taken: <strong>{formatDuration(elapsedSeconds)}</strong>
+          {timedOut && ' (ran out of time)'}
+        </p>
 
         <div className="results-table-wrap">
           <table className="results-table">

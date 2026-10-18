@@ -35,6 +35,41 @@ describe('round timer rules', () => {
     expect(resumed.isPaused).toBe(false)
   })
 
+  it('counts down for the whole round instead of resetting after each answer', () => {
+    const started = reducer(initialState, { type: 'START', mode: 'common', timerEnabled: true, customSeconds: 60 })
+    const ticked = reducer(started, { type: 'TICK' })
+    const firstCode = ticked.codes[ticked.currentIndex].code
+
+    const answered = reducer(ticked, { type: 'CHECK', value: firstCode })
+
+    expect(ticked.timeLeft).toBe(59)
+    // Answering a question must not refill the clock — it's a single countdown for the whole quiz.
+    expect(answered.timeLeft).toBe(59)
+  })
+
+  it('tracks elapsed time even when the countdown timer is disabled', () => {
+    const started = reducer(initialState, { type: 'START', mode: 'common', timerEnabled: false })
+    expect(started.elapsedSeconds).toBe(0)
+
+    const tickedOnce = reducer(started, { type: 'TICK' })
+    const tickedTwice = reducer(tickedOnce, { type: 'TICK' })
+
+    expect(tickedOnce.elapsedSeconds).toBe(1)
+    expect(tickedTwice.elapsedSeconds).toBe(2)
+    expect(tickedTwice.timeLeft).toBe(0)
+  })
+
+  it('keeps counting elapsed time alongside the countdown and stops when paused', () => {
+    const started = reducer(initialState, { type: 'START', mode: 'common', timerEnabled: true, customSeconds: 60 })
+    const ticked = reducer(started, { type: 'TICK' })
+    const paused = reducer(ticked, { type: 'TOGGLE_PAUSE' })
+    const tickedWhilePaused = reducer(paused, { type: 'TICK' })
+
+    expect(ticked.elapsedSeconds).toBe(1)
+    expect(tickedWhilePaused.elapsedSeconds).toBe(1)
+    expect(tickedWhilePaused.timeLeft).toBe(ticked.timeLeft)
+  })
+
   it('revisits skipped codes before ending the round', () => {
     const started = reducer(initialState, { type: 'START', mode: 'common', timerEnabled: false })
     const lastIndex = started.codes.length - 1

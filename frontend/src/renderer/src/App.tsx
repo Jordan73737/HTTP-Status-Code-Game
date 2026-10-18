@@ -14,17 +14,18 @@ export default function App() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const [infoView, setInfoView] = useState<InfoView>(null)
 
-  // Manage timer: start when game begins and pause when requested
+  // Manage timer: start when game begins and pause when requested.
+  // Ticks run even without a countdown so we can report elapsed time at the end.
   useEffect(() => {
     if (timerRef.current) clearInterval(timerRef.current)
     timerRef.current = null
-    if (state.screen === 'game' && state.timerEnabled && !state.isPaused) {
+    if (state.screen === 'game' && !state.isPaused) {
       timerRef.current = setInterval(() => dispatch({ type: 'TICK' }), 1000)
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
     }
-  }, [state.screen, state.isPaused, state.timerEnabled])
+  }, [state.screen, state.isPaused])
 
 
   // Auto-submit as soon as the typed number matches the current code.
