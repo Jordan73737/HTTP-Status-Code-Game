@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Mode } from '../state'
 import { ROUND_TIME_LIMIT } from '../state'
 import { COMMON_CODES, ALL_CODES } from '../statusCodes'
@@ -8,10 +8,15 @@ interface Props {
   onViewCodes: () => void
 }
 
+// Ignore Escape-to-quit for a short window after mount so a trailing keydown
+// left over from backing out of a quiz can't immediately quit the app.
+const QUIT_GUARD_MS = 500
+
 export default function StartScreen({ onStart, onViewCodes }: Props) {
   const [selectedMode, setSelectedMode] = useState<Mode | null>(null)
   const [timerEnabled, setTimerEnabled] = useState(true)
   const [customSeconds, setCustomSeconds] = useState<number | ''>(ROUND_TIME_LIMIT.common)
+  const mountedAtRef = useRef(Date.now())
 
   useEffect(() => {
     if (selectedMode) {
@@ -27,7 +32,7 @@ export default function StartScreen({ onStart, onViewCodes }: Props) {
         if (selectedMode) {
           // Back out of the timer-selection sub-screen instead of quitting
           setSelectedMode(null)
-        } else {
+        } else if (Date.now() - mountedAtRef.current > QUIT_GUARD_MS) {
           window.api?.quitApp()
         }
       }
