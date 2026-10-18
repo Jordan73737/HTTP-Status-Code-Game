@@ -39,10 +39,11 @@ export default function GameScreen({
   }
 
   const currentCode = state.codes[state.currentIndex]
-  const maxTime = ROUND_TIME_LIMIT[state.mode]
-  const timerPct = (state.timeLeft / maxTime) * 100
+  const maxTime = state.timerEnabled ? state.timeLimit || ROUND_TIME_LIMIT[state.mode] : 1
+  const timerPct = state.timerEnabled ? (state.timeLeft / maxTime) * 100 : 100
   const timerClass =
-    timerPct < 30 ? 'timer-fill timer-fill--red'
+    !state.timerEnabled ? 'timer-fill'
+    : timerPct < 30 ? 'timer-fill timer-fill--red'
     : timerPct < 60 ? 'timer-fill timer-fill--yellow'
     : 'timer-fill'
 
@@ -147,11 +148,11 @@ export default function GameScreen({
       {/* ── Bottom legend ── */}
       <footer className="game-legend">
         <span className="legend-item"><kbd>Esc</kbd> Main menu</span>
-        <span className="legend-item"><kbd>P</kbd> {state.isPaused ? 'Resume' : 'Pause'}</span>
+        {state.timerEnabled && <span className="legend-item"><kbd>P</kbd> {state.isPaused ? 'Resume' : 'Pause'}</span>}
         <span className="legend-item"><kbd>Tab</kbd> Skip</span>
         <span className="legend-item"><kbd>Enter</kbd> Check answer</span>
         <span className="legend-item"><kbd>Space</kbd> Give up &amp; see results</span>
-        <span className="legend-timer">⏱ {state.timeLeft}s</span>
+        <span className="legend-timer">⏱ {state.timerEnabled ? `${state.timeLeft}s` : 'No timer'}</span>
       </footer>
     </div>
   )

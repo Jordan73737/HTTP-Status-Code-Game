@@ -18,15 +18,15 @@ export default function App() {
   useEffect(() => {
     if (timerRef.current) clearInterval(timerRef.current)
     timerRef.current = null
-    if (state.screen === 'game' && !state.isPaused) {
+    if (state.screen === 'game' && state.timerEnabled && !state.isPaused) {
       timerRef.current = setInterval(() => dispatch({ type: 'TICK' }), 1000)
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
     }
-  }, [state.screen, state.isPaused])
+  }, [state.screen, state.isPaused, state.timerEnabled])
 
-  // Tab = skip, P = pause, Space = give up, Esc = main menu or quit from the start screen
+  // Tab = skip, P = pause, Space = give up, Esc = back to the main menu unless already there
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (state.screen === 'game') {
@@ -95,6 +95,10 @@ export default function App() {
     setInputValue('')
   }
 
+  const handleStart = (mode: 'common' | 'complete', timerEnabled: boolean, customSeconds?: number) => {
+    dispatch({ type: 'START', mode, timerEnabled, customSeconds })
+  }
+
   const handlePauseToggle = () => {
     dispatch({ type: 'TOGGLE_PAUSE' })
   }
@@ -117,7 +121,7 @@ export default function App() {
         />
       )
     }
-    return <StartScreen onStart={mode => dispatch({ type: 'START', mode })} onViewCodes={() => setInfoView({ screen: 'list' })} />
+    return <StartScreen onStart={handleStart} onViewCodes={() => setInfoView({ screen: 'list' })} />
   }
 
   if (state.screen === 'results') {

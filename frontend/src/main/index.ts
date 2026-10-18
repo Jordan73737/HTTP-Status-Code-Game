@@ -1,6 +1,10 @@
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'path'
 
+// Works around a Windows-specific Chromium crash ("Unable to move the cache:
+// Access is denied") that can bring down the whole app during gameplay.
+app.disableHardwareAcceleration()
+
 function createWindow(): void {
   const win = new BrowserWindow({
     width: 1200,
@@ -18,6 +22,10 @@ function createWindow(): void {
   })
 
   win.on('ready-to-show', () => win.show())
+
+  win.webContents.on('render-process-gone', (_event, details) => {
+    console.error('Renderer process gone:', details)
+  })
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)

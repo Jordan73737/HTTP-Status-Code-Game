@@ -13,23 +13,48 @@ describe('shuffleStatusCodes', () => {
 })
 
 describe('round timer rules', () => {
-  it('uses a fixed round timer for each mode instead of a per-code reset', () => {
+  it('uses the default round timer values and keeps the complete round at 180 seconds', () => {
     const common = reducer(initialState, { type: 'START', mode: 'common' })
     const complete = reducer(initialState, { type: 'START', mode: 'complete' })
 
     expect(common.timeLeft).toBe(60)
-    expect(complete.timeLeft).toBe(120)
-
-    const jumped = reducer(complete, { type: 'JUMP_TO', code: complete.codes[2].code })
-    expect(jumped.timeLeft).toBe(complete.timeLeft)
+    expect(common.timerEnabled).toBe(true)
+    expect(complete.timeLeft).toBe(180)
+    expect(complete.timerEnabled).toBe(true)
   })
 
-  it('supports pausing and resuming during a round', () => {
-    const started = reducer(initialState, { type: 'START', mode: 'common' })
+  it('supports disabling the timer and pausing the round', () => {
+    const noTimer = reducer(initialState, { type: 'START', mode: 'complete', timerEnabled: false })
+    const started = reducer(initialState, { type: 'START', mode: 'common', timerEnabled: true, customSeconds: 45 })
     const paused = reducer(started, { type: 'TOGGLE_PAUSE' })
     const resumed = reducer(paused, { type: 'TOGGLE_PAUSE' })
 
+    expect(noTimer.timerEnabled).toBe(false)
+    expect(noTimer.timeLeft).toBe(0)
     expect(paused.isPaused).toBe(true)
     expect(resumed.isPaused).toBe(false)
+  })
+
+  it('revisits skipped codes before ending the round', () => {
+    const started = reducer(initialState, { type: 'START', mode: 'common', timerEnabled: false })
+    const lastIndex = started.codes.length - 1
+    const missed = new Set([1, 2, 3])
+    const state = {
+      ...started,
+      currentIndex: lastIndex,
+      guessed: new Set(
+        Array.from({ length: started.codes.length }, (_, index) => index).filter(index => !missed.has(index) && index !== lastIndex),
+      ),
+      skipped: missed,
+      timeLeft: 0,
+      timeLimit: 0,
+      timerEnabled: false,
+    }
+
+    const next = reducer(state, { type: 'CHECK', value: started.codes[lastIndex].code })
+
+    expect(next.screen).toBe('game')
+    expect(next.currentIndex).toBe(1)
+    expect(next.guessed.has(lastIndex)).toBe(true)
   })
 })
