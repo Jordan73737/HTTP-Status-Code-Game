@@ -22,7 +22,14 @@ export default function StartScreen({ onStart, onViewCodes }: Props) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Enter' && selectedMode) onStart(selectedMode, timerEnabled, timerEnabled ? customSeconds : undefined)
-      if (e.key === 'Escape') window.api?.quitApp()
+      if (e.key === 'Escape') {
+        if (selectedMode) {
+          // Back out of the timer-selection sub-screen instead of quitting
+          setSelectedMode(null)
+        } else {
+          window.api?.quitApp()
+        }
+      }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
@@ -113,7 +120,7 @@ export default function StartScreen({ onStart, onViewCodes }: Props) {
         </button>
         <p className="start-hint">
           {selectedMode
-            ? <>Press <kbd>Enter</kbd> to start {selectedMode === 'common' ? 'Common' : 'Complete'} · <kbd>Esc</kbd> to quit</>
+            ? <>Press <kbd>Enter</kbd> to start {selectedMode === 'common' ? 'Common' : 'Complete'} · <kbd>Esc</kbd> to go back</>
             : <>Select a quiz mode to continue · <kbd>Esc</kbd> to quit</>}
         </p>
       </div>
