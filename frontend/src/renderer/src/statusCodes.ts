@@ -285,9 +285,9 @@ export const ALL_CODES: StatusCode[] = [
   },
   {
     code: 425, title: 'Too Early',
-    summary: 'The server won\'t process a request that might be replayed.',
-    example: 'An early-data TLS 1.3 request that could be a replay attack.',
-    usedFor: 'TLS 1.3 early data protection — prevents replay attacks before the handshake fully completes.',
+    summary: 'The server refuses to process a request sent as TLS 1.3 early data because it could be replayed.',
+    example: 'A payment request sent before the TLS handshake completes is rejected because an attacker could replay it.',
+    usedFor: 'Protects against replaying sensitive requests. Clients retry after the handshake only when the operation is safe or idempotent; 425 itself does not make a request idempotent.',
   },
   {
     code: 426, title: 'Upgrade Required',
