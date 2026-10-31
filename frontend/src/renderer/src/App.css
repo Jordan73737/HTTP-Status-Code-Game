@@ -520,9 +520,13 @@ kbd {
   place-items: center;
   background: rgba(13, 17, 23, 0.72);
   z-index: 10;
+  /* Let wheel and pointer events reach the codes list underneath while paused. */
+  pointer-events: none;
 }
 
 .pause-card {
+  pointer-events: auto;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;

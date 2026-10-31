@@ -70,6 +70,16 @@ describe('round timer rules', () => {
     expect(tickedWhilePaused.timeLeft).toBe(ticked.timeLeft)
   })
 
+  it('ignores jump-to-code clicks while paused so the paused round stays unchanged', () => {
+    const started = reducer(initialState, { type: 'START', mode: 'common', timerEnabled: true, customSeconds: 60 })
+    const paused = reducer(started, { type: 'TOGGLE_PAUSE' })
+    const target = paused.codes[5].code
+    const jumped = reducer(paused, { type: 'JUMP_TO', code: target })
+
+    expect(jumped).toBe(paused)
+    expect(jumped.currentIndex).toBe(paused.currentIndex)
+  })
+
   it('revisits skipped codes before ending the round', () => {
     const started = reducer(initialState, { type: 'START', mode: 'common', timerEnabled: false })
     const lastIndex = started.codes.length - 1

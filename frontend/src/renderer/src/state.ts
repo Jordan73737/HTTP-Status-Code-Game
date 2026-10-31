@@ -130,7 +130,7 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'GIVE_UP':
       return { ...state, screen: 'results', isPaused: false }
     case 'JUMP_TO': {
-      if (state.screen !== 'game') return state
+      if (state.screen !== 'game' || state.isPaused) return state
       const idx = state.codes.findIndex(c => c.code === action.code)
       if (idx === -1) return state
       // Hardcore codes are locked in once failed — no jumping back for a second attempt.

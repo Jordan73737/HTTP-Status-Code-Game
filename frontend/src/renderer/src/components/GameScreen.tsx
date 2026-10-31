@@ -34,7 +34,7 @@ export default function GameScreen({
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Focus input on mount and whenever currentIndex changes (after each correct answer)
-  useEffect(() => { inputRef.current?.focus() }, [state.currentIndex])
+  useEffect(() => { inputRef.current?.focus() }, [state.currentIndex, state.isPaused])
 
   // Tab = skip, P = pause, Space = give up, Esc = main menu — scoped to this screen's own lifetime
   useEffect(() => {
@@ -185,10 +185,11 @@ export default function GameScreen({
       </div>
 
       {state.isPaused && (
-        <div className="pause-overlay" onClick={onTogglePause}>
-          <div className="pause-card">
+        // The overlay itself is non-interactive so the codes list behind it can still be scrolled.
+        <div className="pause-overlay">
+          <div className="pause-card" onClick={onTogglePause}>
             <div className="pause-title">Paused</div>
-            <div className="pause-subtitle">Press <kbd>P</kbd> to resume</div>
+            <div className="pause-subtitle">Press <kbd>P</kbd> or click to resume</div>
           </div>
         </div>
       )}
