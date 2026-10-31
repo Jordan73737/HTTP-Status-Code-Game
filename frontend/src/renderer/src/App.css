@@ -544,7 +544,10 @@ kbd {
 }
 
 .legend-item { display: flex; align-items: center; gap: 6px; }
-.legend-timer { margin-left: auto; font-weight: 600; color: var(--text); font-size: 14px; }
+.legend-timer-group { margin-left: auto; display: flex; align-items: center; gap: 18px; flex-shrink: 0; }
+.legend-stat { color: var(--text-muted); font-size: 13px; white-space: nowrap; }
+.legend-stat strong { color: var(--text); font-weight: 600; }
+.legend-timer { font-weight: 600; color: var(--text); font-size: 14px; white-space: nowrap; }
 
 /* header */
 .game-header {
@@ -798,9 +801,15 @@ kbd {
 
 .rrow td { padding: 7px 14px; border-bottom: 1px solid var(--border); }
 .rrow--correct { background: var(--green-dim); color: var(--green); }
+.rrow--slow { background: var(--yellow-dim); color: var(--yellow); font-weight: 600; }
 .rrow--skipped { color: var(--text-muted); }
 .rrow--failed { background: var(--red-dim); color: var(--red); }
 .rrow--timeout { background: var(--red-dim); color: var(--red); }
+
+.results-times { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.results-hint { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
+.results-hint-swatch { width: 12px; height: 12px; border-radius: 3px; background: var(--yellow-dim); border: 1px solid var(--yellow); }
+.badge--new-best { margin-left: 8px; background: var(--yellow-dim); color: var(--yellow); border: 1px solid var(--yellow); }
 
 .results-actions { display: flex; gap: 12px; }
 

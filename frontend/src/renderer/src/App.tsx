@@ -1,6 +1,7 @@
 import { useReducer, useEffect, useRef, useState } from 'react'
 import { reducer, initialState } from './state'
 import { isTitleMatch } from './statusCodes'
+import { BestTimes, isPerfectRun, loadBestTimes, runKey, saveBestTime } from './timing'
 import StartScreen from './components/StartScreen'
 import GameScreen from './components/GameScreen'
 import ResultsScreen from './components/ResultsScreen'
@@ -14,6 +15,20 @@ export default function App() {
   const [inputValue, setInputValue] = useState('')
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const [infoView, setInfoView] = useState<InfoView>(null)
+  const [bestTimes, setBestTimes] = useState<BestTimes>(loadBestTimes)
+
+  const currentRunKey = runKey(state)
+  const priorBest = bestTimes[currentRunKey] ?? null
+  const isNewBest =
+    state.screen === 'results' &&
+    isPerfectRun(state) &&
+    (priorBest === null || state.elapsedSeconds < priorBest)
+
+  // Persist a new personal best once the results screen reveals it.
+  useEffect(() => {
+    if (!isNewBest) return
+    setBestTimes(saveBestTime(currentRunKey, state.elapsedSeconds))
+  }, [isNewBest, currentRunKey, state.elapsedSeconds])
 
   // Manage timer: start when game begins and pause when requested.
   // Ticks run even without a countdown so we can report elapsed time at the end.
@@ -121,6 +136,8 @@ export default function App() {
     return (
       <ResultsScreen
         state={state}
+        timeToBeat={isNewBest ? state.elapsedSeconds : priorBest}
+        isNewBest={isNewBest}
         onPlayAgain={() => {
           setInputValue('')
           dispatch({
@@ -140,6 +157,7 @@ export default function App() {
   return (
     <GameScreen
       state={state}
+      bestTime={priorBest}
       inputValue={inputValue}
       onInputChange={handleInputChange}
       onCheck={handleCheck}

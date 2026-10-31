@@ -28,6 +28,8 @@ export interface AppState {
   timerEnabled: boolean
   isPaused: boolean
   elapsedSeconds: number
+  /** Seconds spent on each code (by index) while it was still unresolved. */
+  codeTimes: Record<number, number>
 }
 
 export const initialState: AppState = {
@@ -45,6 +47,7 @@ export const initialState: AppState = {
   timerEnabled: true,
   isPaused: false,
   elapsedSeconds: 0,
+  codeTimes: {},
 }
 
 export type Action =
@@ -84,18 +87,24 @@ export function reducer(state: AppState, action: Action): AppState {
         timerEnabled,
         isPaused: false,
         elapsedSeconds: 0,
+        codeTimes: {},
       }
     }
     case 'TICK': {
       if (state.screen !== 'game' || state.isPaused) return state
       const elapsedSeconds = state.elapsedSeconds + 1
+      const idx = state.currentIndex
+      const isUnresolved = !state.guessed.has(idx) && !state.failed.has(idx)
+      const codeTimes = isUnresolved
+        ? { ...state.codeTimes, [idx]: (state.codeTimes[idx] ?? 0) + 1 }
+        : state.codeTimes
       if (!state.timerEnabled) {
-        return { ...state, elapsedSeconds }
+        return { ...state, elapsedSeconds, codeTimes }
       }
       if (state.timeLeft <= 1) {
-        return { ...state, timeLeft: 0, elapsedSeconds, screen: 'results', isPaused: false }
+        return { ...state, timeLeft: 0, elapsedSeconds, codeTimes, screen: 'results', isPaused: false }
       }
-      return { ...state, timeLeft: state.timeLeft - 1, elapsedSeconds }
+      return { ...state, timeLeft: state.timeLeft - 1, elapsedSeconds, codeTimes }
     }
     case 'CHECK': {
       if (state.screen !== 'game' || state.isPaused) return state

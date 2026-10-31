@@ -1,11 +1,14 @@
 import { useRef, useEffect, KeyboardEvent } from 'react'
 import type { AppState } from '../state'
 import { ROUND_TIME_LIMIT, HARDCORE_TIMED_DEFAULT } from '../state'
+import { formatDuration } from '../timing'
 
 const QUEUE_WINDOW = 14 // how many upcoming items to show in the conveyor belt
 
 interface Props {
   state: AppState
+  /** Best elapsed time for this quiz setup, or null if none has been set yet. */
+  bestTime: number | null
   inputValue: string
   onInputChange: (v: string) => void
   onCheck: () => void
@@ -18,6 +21,7 @@ interface Props {
 
 export default function GameScreen({
   state,
+  bestTime,
   inputValue,
   onInputChange,
   onCheck,
@@ -196,7 +200,15 @@ export default function GameScreen({
         <span className="legend-item"><kbd>Tab</kbd> Skip</span>
         <span className="legend-item"><kbd>Enter</kbd> Check answer</span>
         <span className="legend-item"><kbd>Space</kbd> Give up &amp; see results</span>
-        <span className="legend-timer">⏱ {state.timerEnabled ? `${state.timeLeft}s` : 'No timer'}</span>
+        <span className="legend-timer-group">
+          <span className="legend-stat">
+            Time to beat <strong>{bestTime !== null ? formatDuration(bestTime) : '—'}</strong>
+          </span>
+          <span className="legend-stat">
+            Elapsed <strong>{formatDuration(state.elapsedSeconds)}</strong>
+          </span>
+          <span className="legend-timer">⏱ {state.timerEnabled ? `${state.timeLeft}s` : 'No timer'}</span>
+        </span>
       </footer>
     </div>
   )
