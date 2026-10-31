@@ -4,6 +4,8 @@ export interface StatusCode {
   summary: string
   example: string
   usedFor: string
+  /** Additional acceptable answers for Alternate mode (type-the-title), when a code is commonly known by more than one name. */
+  altTitles?: string[]
 }
 
 export const ALL_CODES: StatusCode[] = [
@@ -132,6 +134,7 @@ export const ALL_CODES: StatusCode[] = [
     summary: 'This code is no longer used and is reserved.',
     example: 'Never seen in practice — it was briefly "Switch Proxy" in an early HTTP/1.1 draft.',
     usedFor: 'Reserved; has no current function.',
+    altTitles: ['Switch Proxy', 'Unused'],
   },
   {
     code: 307, title: 'Temporary Redirect',
@@ -398,6 +401,15 @@ const COMMON_CODE_NUMBERS = new Set([
 export const COMMON_CODES: StatusCode[] = ALL_CODES.filter(c =>
   COMMON_CODE_NUMBERS.has(c.code)
 )
+
+/** Case-insensitive check used by Alternate mode: does `input` match this code's title (or one of its accepted alternates)? */
+export function isTitleMatch(sc: StatusCode, input: string): boolean {
+  const normalize = (s: string) => s.trim().toLowerCase()
+  const target = normalize(input)
+  if (target === '') return false
+  const candidates = sc.altTitles && sc.altTitles.length > 0 ? sc.altTitles : [sc.title]
+  return candidates.some(candidate => normalize(candidate) === target)
+}
 
 export function shuffleStatusCodes<T>(items: T[], random: () => number = Math.random): T[] {
   const copy = [...items]

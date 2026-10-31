@@ -14,11 +14,11 @@ function formatDuration(totalSeconds: number): string {
 }
 
 export default function ResultsScreen({ state, onPlayAgain, onMenu }: Props) {
-  const { codes, guessed, skipped, elapsedSeconds, timerEnabled, timeLeft } = state
+  const { codes, guessed, skipped, failed, elapsedSeconds, timerEnabled, timeLeft } = state
   const correct = guessed.size
   const total = codes.length
   const pct = total > 0 ? Math.round((correct / total) * 100) : 0
-  const timedOut = timerEnabled && timeLeft <= 0 && guessed.size + skipped.size < total
+  const timedOut = timerEnabled && timeLeft <= 0 && guessed.size + skipped.size + failed.size < total
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -57,9 +57,12 @@ export default function ResultsScreen({ state, onPlayAgain, onMenu }: Props) {
             <tbody>
               {codes.map((sc, idx) => {
                 const isGuessed = guessed.has(idx)
+                const isFailed = failed.has(idx)
                 const isSkipped = skipped.has(idx)
                 const cls = isGuessed
                   ? 'rrow rrow--correct'
+                  : isFailed
+                  ? 'rrow rrow--failed'
                   : isSkipped
                   ? 'rrow rrow--skipped'
                   : 'rrow rrow--timeout'
@@ -68,7 +71,7 @@ export default function ResultsScreen({ state, onPlayAgain, onMenu }: Props) {
                     <td>{sc.code}</td>
                     <td>{sc.title}</td>
                     <td>
-                      {isGuessed ? '✓ Correct' : isSkipped ? '→ Skipped' : '✗ Timed out'}
+                      {isGuessed ? '✓ Correct' : isFailed ? '✗ Failed' : isSkipped ? '→ Skipped' : '✗ Timed out'}
                     </td>
                   </tr>
                 )

@@ -1,5 +1,6 @@
 import { useReducer, useEffect, useRef, useState } from 'react'
 import { reducer, initialState } from './state'
+import { isTitleMatch } from './statusCodes'
 import StartScreen from './components/StartScreen'
 import GameScreen from './components/GameScreen'
 import ResultsScreen from './components/ResultsScreen'
@@ -27,31 +28,47 @@ export default function App() {
     }
   }, [state.screen, state.isPaused])
 
+  // Alternate mode compares typed text against the title; normal mode compares the typed number against the code.
+  const isCorrectAnswer = (raw: string): boolean => {
+    const currentCode = state.codes[state.currentIndex]
+    if (!currentCode) return false
+    if (state.alternate) return isTitleMatch(currentCode, raw)
+    const val = parseInt(raw.trim(), 10)
+    return !isNaN(val) && val === currentCode.code
+  }
 
-  // Auto-submit as soon as the typed number matches the current code.
-  // Also called manually via Enter key.
+  const dispatchCorrect = (raw: string) => {
+    const currentCode = state.codes[state.currentIndex]
+    if (!currentCode) return
+    if (state.alternate) {
+      dispatch({ type: 'CHECK_TEXT', value: raw })
+    } else {
+      dispatch({ type: 'CHECK', value: currentCode.code })
+    }
+  }
+
+  // Hardcore: nothing is registered until Enter is pressed — wrong there is a single failed attempt.
+  // Normal/non-hardcore: also called manually via Enter, but typing already auto-submits correct answers (see handleInputChange).
   const handleCheck = (overrideValue?: string) => {
     const raw = overrideValue ?? inputValue
-    const val = parseInt(raw.trim(), 10)
-    if (isNaN(val)) return
-    const currentCode = state.codes[state.currentIndex]?.code
-    if (val === currentCode) {
+    if (raw.trim() === '') return
+    if (isCorrectAnswer(raw)) {
       setInputValue('')
-      dispatch({ type: 'CHECK', value: val })
+      dispatchCorrect(raw)
+    } else if (state.hardcore) {
+      setInputValue('')
+      dispatch({ type: 'FAIL' })
     }
-    // Wrong answer: nothing happens, input stays so user can correct it
+    // Non-hardcore wrong answer: nothing happens, input stays so the user can correct it.
   }
 
   const handleInputChange = (v: string) => {
     setInputValue(v)
-    // Immediately check — all HTTP codes are 3 digits so this fires on the right keystroke
-    const val = parseInt(v, 10)
-    if (!isNaN(val)) {
-      const currentCode = state.codes[state.currentIndex]?.code
-      if (val === currentCode) {
-        setInputValue('')
-        dispatch({ type: 'CHECK', value: val })
-      }
+    // Hardcore requires an explicit Enter press before an answer is registered — no live auto-check.
+    if (state.hardcore) return
+    if (isCorrectAnswer(v)) {
+      setInputValue('')
+      dispatchCorrect(v)
     }
   }
 
@@ -65,8 +82,14 @@ export default function App() {
     dispatch({ type: 'RESET' })
   }
 
-  const handleStart = (mode: 'common' | 'complete', timerEnabled: boolean, customSeconds?: number) => {
-    dispatch({ type: 'START', mode, timerEnabled, customSeconds })
+  const handleStart = (
+    mode: 'common' | 'complete',
+    timerEnabled: boolean,
+    customSeconds?: number,
+    hardcore?: boolean,
+    alternate?: boolean,
+  ) => {
+    dispatch({ type: 'START', mode, timerEnabled, customSeconds, hardcore, alternate })
   }
 
   const handlePauseToggle = () => {
@@ -98,7 +121,17 @@ export default function App() {
     return (
       <ResultsScreen
         state={state}
-        onPlayAgain={() => { setInputValue(''); dispatch({ type: 'START', mode: state.mode }) }}
+        onPlayAgain={() => {
+          setInputValue('')
+          dispatch({
+            type: 'START',
+            mode: state.mode,
+            hardcore: state.hardcore,
+            alternate: state.alternate,
+            timerEnabled: state.timerEnabled,
+            customSeconds: state.timerEnabled ? state.timeLimit : undefined,
+          })
+        }}
         onMenu={handleMenu}
       />
     )

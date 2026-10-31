@@ -1,6 +1,6 @@
 import { useRef, useEffect, KeyboardEvent } from 'react'
 import type { AppState } from '../state'
-import { ROUND_TIME_LIMIT } from '../state'
+import { ROUND_TIME_LIMIT, HARDCORE_TIMED_DEFAULT } from '../state'
 
 const QUEUE_WINDOW = 14 // how many upcoming items to show in the conveyor belt
 
@@ -66,7 +66,7 @@ export default function GameScreen({
   }
 
   const currentCode = state.codes[state.currentIndex]
-  const maxTime = state.timerEnabled ? state.timeLimit || ROUND_TIME_LIMIT[state.mode] : 1
+  const maxTime = state.timerEnabled ? state.timeLimit || (state.hardcore ? HARDCORE_TIMED_DEFAULT : ROUND_TIME_LIMIT[state.mode]) : 1
   const timerPct = state.timerEnabled ? (state.timeLeft / maxTime) * 100 : 100
   const timerClass =
     !state.timerEnabled ? 'timer-fill'
@@ -88,6 +88,8 @@ export default function GameScreen({
             <span className="badge badge--mode">
               {state.mode === 'common' ? 'Common' : 'Complete'}
             </span>
+            {state.hardcore && <span className="badge badge--hardcore">Hardcore</span>}
+            {state.alternate && <span className="badge badge--alternate">Alternate</span>}
             <span className="badge badge--score">
               {state.guessed.size} / {state.codes.length}
             </span>
@@ -96,16 +98,23 @@ export default function GameScreen({
 
         <div className="input-area">
           <label className="input-label">
-            What is the code for <strong>&ldquo;{currentCode?.title}&rdquo;</strong>?
+            {state.alternate
+              ? <>What is the title for <strong>{currentCode?.code}</strong>?</>
+              : <>What is the code for <strong>&ldquo;{currentCode?.title}&rdquo;</strong>?</>}
           </label>
           <input
             ref={inputRef}
             className="code-input"
             type="text"
-            inputMode="numeric"
-            placeholder={state.isPaused ? 'Paused' : 'e.g. 404'}
+            inputMode={state.alternate ? 'text' : 'numeric'}
+            placeholder={
+              state.isPaused ? 'Paused'
+              : state.hardcore ? (state.alternate ? 'Type the title, then press Enter' : 'Type the code, then press Enter')
+              : state.alternate ? 'e.g. Not Found'
+              : 'e.g. 404'
+            }
             value={state.isPaused ? '' : inputValue}
-            onChange={e => onInputChange(e.target.value.replace(/\D/g, ''))}
+            onChange={e => onInputChange(state.alternate ? e.target.value : e.target.value.replace(/\D/g, ''))}
             onKeyDown={handleKeyDown}
             disabled={state.isPaused}
           />
@@ -127,7 +136,7 @@ export default function GameScreen({
                 style={isCurrent ? undefined : { opacity }}
               >
                 <span className="queue-arrow">{isCurrent ? '▶' : ''}</span>
-                <span className="queue-title">{sc.title}</span>
+                <span className="queue-title">{state.alternate ? sc.code : sc.title}</span>
               </li>
             )
           })}
@@ -143,9 +152,16 @@ export default function GameScreen({
         <div className="codes-grid">
           {state.codes.map((sc, idx) => {
             const isGuessed = state.guessed.has(idx)
+            const isFailed = state.failed.has(idx)
             const isCurrent = idx === state.currentIndex
+            // Reveal the hidden side once a code is resolved (guessed or permanently failed), not only when guessed.
+            const resolved = isGuessed || isFailed
+            // Alternate mode shows the code up-front and hides the title until resolved; normal mode is the reverse.
+            const codeHidden = !state.alternate && !resolved
+            const titleHidden = state.alternate && !resolved
             let cls = 'code-cell'
             if (isGuessed) cls += ' code-cell--guessed'
+            if (isFailed) cls += ' code-cell--failed'
             if (isCurrent) cls += ' code-cell--current'
             return (
               <div
@@ -154,9 +170,10 @@ export default function GameScreen({
                 onClick={() => onJumpTo(sc.code)}
                 title="Jump to this code"
               >
-                <span className={`cell-code${isGuessed ? '' : ' cell-code--hidden'}`}>{sc.code}</span>
-                <span className="cell-title">{sc.title}</span>
+                <span className={`cell-code${codeHidden ? ' cell-code--hidden' : ''}`}>{sc.code}</span>
+                <span className={`cell-title${titleHidden ? ' cell-title--hidden' : ''}`}>{sc.title}</span>
                 {isGuessed && <span className="cell-check">✓</span>}
+                {isFailed && <span className="cell-check cell-check--failed">✗</span>}
               </div>
             )
           })}

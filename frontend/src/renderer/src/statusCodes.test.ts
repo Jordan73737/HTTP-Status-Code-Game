@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { reducer, initialState } from './state'
-import { COMMON_CODES, shuffleStatusCodes } from './statusCodes'
+import { ALL_CODES, COMMON_CODES, isTitleMatch, shuffleStatusCodes } from './statusCodes'
 
 describe('shuffleStatusCodes', () => {
   it('randomizes the short quiz order instead of keeping the static array sequence', () => {
@@ -91,5 +91,61 @@ describe('round timer rules', () => {
     expect(next.screen).toBe('game')
     expect(next.currentIndex).toBe(1)
     expect(next.guessed.has(lastIndex)).toBe(true)
+  })
+})
+
+describe('isTitleMatch', () => {
+  it('matches the title case-insensitively, ignoring surrounding whitespace', () => {
+    const notFound = ALL_CODES.find(c => c.code === 404)!
+    expect(isTitleMatch(notFound, 'not found')).toBe(true)
+    expect(isTitleMatch(notFound, '  NOT FOUND  ')).toBe(true)
+    expect(isTitleMatch(notFound, 'not here')).toBe(false)
+  })
+
+  it('accepts either accepted name for codes with multiple common titles (306)', () => {
+    const code306 = ALL_CODES.find(c => c.code === 306)!
+    expect(isTitleMatch(code306, 'Switch Proxy')).toBe(true)
+    expect(isTitleMatch(code306, 'unused')).toBe(true)
+    expect(isTitleMatch(code306, 'Switch Proxy / UNUSED')).toBe(false)
+  })
+})
+
+describe('hardcore mode', () => {
+  it('fails and locks in a code on a wrong submission, advancing without allowing a retry', () => {
+    const started = reducer(initialState, { type: 'START', mode: 'common', hardcore: true, timerEnabled: false })
+    const firstIndex = started.currentIndex
+
+    const failed = reducer(started, { type: 'FAIL' })
+
+    expect(failed.failed.has(firstIndex)).toBe(true)
+    expect(failed.currentIndex).not.toBe(firstIndex)
+
+    // Jumping back to the failed code must not be possible — no second attempts in Hardcore.
+    const jumpAttempt = reducer(failed, { type: 'JUMP_TO', code: started.codes[firstIndex].code })
+    expect(jumpAttempt.currentIndex).toBe(failed.currentIndex)
+  })
+
+  it('ignores FAIL outside of hardcore mode', () => {
+    const started = reducer(initialState, { type: 'START', mode: 'common', hardcore: false, timerEnabled: false })
+    const failed = reducer(started, { type: 'FAIL' })
+    expect(failed).toEqual(started)
+  })
+
+  it('defaults Hardcore Timed to 180 seconds when no custom duration is given', () => {
+    const started = reducer(initialState, { type: 'START', mode: 'common', hardcore: true, timerEnabled: true })
+    expect(started.timeLimit).toBe(180)
+  })
+})
+
+describe('alternate mode', () => {
+  it('advances on a matching typed title and ignores a non-matching one', () => {
+    const started = reducer(initialState, { type: 'START', mode: 'common', alternate: true, timerEnabled: false })
+    const correctTitle = started.codes[started.currentIndex].title
+
+    const wrong = reducer(started, { type: 'CHECK_TEXT', value: 'definitely wrong' })
+    expect(wrong).toEqual(started)
+
+    const right = reducer(started, { type: 'CHECK_TEXT', value: correctTitle.toUpperCase() })
+    expect(right.guessed.has(started.currentIndex)).toBe(true)
   })
 })
