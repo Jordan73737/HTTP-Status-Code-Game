@@ -402,13 +402,43 @@ export const COMMON_CODES: StatusCode[] = ALL_CODES.filter(c =>
   COMMON_CODE_NUMBERS.has(c.code)
 )
 
-/** Case-insensitive check used by Alternate mode: does `input` match this code's title (or one of its accepted alternates)? */
-export function isTitleMatch(sc: StatusCode, input: string): boolean {
-  const normalize = (s: string) => s.trim().toLowerCase()
-  const target = normalize(input)
+/** Keep only lowercase letters and digits, so case, spacing and punctuation don't matter. */
+function normalizeTitle(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]/g, '')
+}
+
+function editDistance(a: string, b: string): number {
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j)
+  for (let i = 1; i <= a.length; i += 1) {
+    const curr = [i]
+    for (let j = 1; j <= b.length; j += 1) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1
+      curr[j] = Math.min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost)
+    }
+    prev = curr
+  }
+  return prev[b.length]
+}
+
+/** Short titles get no leeway; medium titles allow one typo, long titles allow two. */
+function allowedTypos(normalizedTitle: string): number {
+  if (normalizedTitle.length <= 4) return 0
+  return normalizedTitle.length <= 9 ? 1 : 2
+}
+
+/**
+ * Alternate mode check against this code's title (or accepted alternates).
+ * Exact matches ignore case, spacing and punctuation. With `allowTypos`, a near-miss
+ * within the typo allowance for that title also counts.
+ */
+export function isTitleMatch(sc: StatusCode, input: string, allowTypos = false): boolean {
+  const target = normalizeTitle(input)
   if (target === '') return false
-  const candidates = sc.altTitles && sc.altTitles.length > 0 ? sc.altTitles : [sc.title]
-  return candidates.some(candidate => normalize(candidate) === target)
+  const candidates = (sc.altTitles && sc.altTitles.length > 0 ? sc.altTitles : [sc.title]).map(normalizeTitle)
+  return candidates.some(candidate => {
+    if (candidate === target) return true
+    return allowTypos && editDistance(candidate, target) <= allowedTypos(candidate)
+  })
 }
 
 export function shuffleStatusCodes<T>(items: T[], random: () => number = Math.random): T[] {

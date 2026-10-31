@@ -118,6 +118,28 @@ describe('isTitleMatch', () => {
     expect(isTitleMatch(code306, 'unused')).toBe(true)
     expect(isTitleMatch(code306, 'Switch Proxy / UNUSED')).toBe(false)
   })
+
+  it('ignores spacing, hyphens and punctuation for exact matches', () => {
+    const notFound = ALL_CODES.find(c => c.code === 404)!
+    expect(isTitleMatch(notFound, 'notfound')).toBe(true)
+    expect(isTitleMatch(notFound, 'not-found')).toBe(true)
+  })
+
+  it('only accepts typos when allowed, and only within the title allowance', () => {
+    const loop = ALL_CODES.find(c => c.code === 508)!
+    expect(isTitleMatch(loop, 'Loop Detcted')).toBe(false)
+    expect(isTitleMatch(loop, 'Loop Detcted', true)).toBe(true)
+    expect(isTitleMatch(loop, 'Loop Dtected', true)).toBe(true)
+    expect(isTitleMatch(loop, 'Lop Dettected', true)).toBe(true)
+    expect(isTitleMatch(loop, 'Loop Dtectd xx', true)).toBe(false)
+    expect(isTitleMatch(loop, 'Loop', true)).toBe(false)
+  })
+
+  it('gives short titles no typo leeway', () => {
+    const gone = ALL_CODES.find(c => c.code === 410)!
+    expect(isTitleMatch(gone, 'Gnoe', true)).toBe(false)
+    expect(isTitleMatch(gone, 'Gone', true)).toBe(true)
+  })
 })
 
 describe('hardcore mode', () => {

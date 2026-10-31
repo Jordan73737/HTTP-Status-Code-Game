@@ -115,7 +115,7 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'CHECK_TEXT': {
       if (state.screen !== 'game' || state.isPaused) return state
       const currentCode = state.codes[state.currentIndex]
-      if (!currentCode || !isTitleMatch(currentCode, action.value)) return state
+      if (!currentCode || !isTitleMatch(currentCode, action.value, true)) return state
       return advance(state, 'correct')
     }
     case 'FAIL': {

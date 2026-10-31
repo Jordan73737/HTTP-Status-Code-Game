@@ -44,10 +44,11 @@ export default function App() {
   }, [state.screen, state.isPaused])
 
   // Alternate mode compares typed text against the title; normal mode compares the typed number against the code.
-  const isCorrectAnswer = (raw: string): boolean => {
+  // Typo leeway only applies to Alternate mode and only when Enter is pressed, so typing never auto-submits a near-miss.
+  const isCorrectAnswer = (raw: string, allowTypos = false): boolean => {
     const currentCode = state.codes[state.currentIndex]
     if (!currentCode) return false
-    if (state.alternate) return isTitleMatch(currentCode, raw)
+    if (state.alternate) return isTitleMatch(currentCode, raw, allowTypos)
     const val = parseInt(raw.trim(), 10)
     return !isNaN(val) && val === currentCode.code
   }
@@ -67,7 +68,7 @@ export default function App() {
   const handleCheck = (overrideValue?: string) => {
     const raw = overrideValue ?? inputValue
     if (raw.trim() === '') return
-    if (isCorrectAnswer(raw)) {
+    if (isCorrectAnswer(raw, true)) {
       setInputValue('')
       dispatchCorrect(raw)
     } else if (state.hardcore) {

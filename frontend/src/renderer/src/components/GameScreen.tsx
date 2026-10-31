@@ -40,15 +40,18 @@ export default function GameScreen({
   useEffect(() => {
     const handler = (e: globalThis.KeyboardEvent) => {
       if (e.repeat) return
+      // In Alternate mode the answer is typed text, so plain P and Space belong to the input; Ctrl+P / Ctrl+Space act as hotkeys there.
+      const typingAnswer = state.alternate && e.target instanceof HTMLInputElement && e.target.classList.contains('code-input')
+      const modified = e.ctrlKey || e.metaKey
       if (e.key === 'Tab') {
         e.preventDefault()
         onSkip()
       }
-      if (e.key.toLowerCase() === 'p') {
+      if (e.key.toLowerCase() === 'p' && (modified || !typingAnswer)) {
         e.preventDefault()
         onTogglePause()
       }
-      if (e.key === ' ') {
+      if (e.key === ' ' && (modified || !typingAnswer)) {
         e.preventDefault()
         onGiveUp()
       }
@@ -59,7 +62,7 @@ export default function GameScreen({
     }
     window.addEventListener('keydown', handler, { capture: true })
     return () => window.removeEventListener('keydown', handler, { capture: true })
-  }, [onSkip, onTogglePause, onGiveUp, onMenu])
+  }, [state.alternate, onSkip, onTogglePause, onGiveUp, onMenu])
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -197,10 +200,10 @@ export default function GameScreen({
       {/* ── Bottom legend ── */}
       <footer className="game-legend">
         <span className="legend-item"><kbd>Esc</kbd> Main menu</span>
-        {state.timerEnabled && <span className="legend-item"><kbd>P</kbd> {state.isPaused ? 'Resume' : 'Pause'}</span>}
+        {state.timerEnabled && <span className="legend-item"><kbd>{state.alternate ? 'Ctrl+P' : 'P'}</kbd> {state.isPaused ? 'Resume' : 'Pause'}</span>}
         <span className="legend-item"><kbd>Tab</kbd> Skip</span>
         <span className="legend-item"><kbd>Enter</kbd> Check answer</span>
-        <span className="legend-item"><kbd>Space</kbd> Give up &amp; see results</span>
+        <span className="legend-item"><kbd>{state.alternate ? 'Ctrl+Space' : 'Space'}</kbd> Give up &amp; see results</span>
         <span className="legend-timer-group">
           <span className="legend-stat">
             Time to beat <strong>{bestTime !== null ? formatDuration(bestTime) : '—'}</strong>
