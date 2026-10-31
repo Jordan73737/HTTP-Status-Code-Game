@@ -1,8 +1,11 @@
 import { useEffect } from 'react'
-import { ALL_CODES } from '../statusCodes'
+import { CODE_SET_LABELS } from '../statusCodes'
+import type { CodeSet, StatusCode } from '../statusCodes'
 
 interface Props {
   code: number
+  codeSet: CodeSet
+  codes: StatusCode[]
   onBack: () => void
   onSelectCode: (code: number) => void
 }
@@ -12,14 +15,18 @@ function accentForCode(code: number): string {
   if (code < 300) return 'var(--green)'
   if (code < 400) return 'var(--yellow)'
   if (code < 500) return '#f0883e'
-  return 'var(--red)'
+  if (code < 600) return 'var(--red)'
+  if (code < 700) return '#f778ba'
+  if (code < 800) return '#bc8cff'
+  if (code < 900) return '#d2a8ff'
+  return '#db61a2'
 }
 
-export default function CodeDetailScreen({ code, onBack, onSelectCode }: Props) {
-  const idx = ALL_CODES.findIndex(c => c.code === code)
-  const sc = ALL_CODES[idx]
-  const prev = ALL_CODES[idx - 1] ?? null
-  const next = ALL_CODES[idx + 1] ?? null
+export default function CodeDetailScreen({ code, codeSet, codes, onBack, onSelectCode }: Props) {
+  const idx = codes.findIndex(c => c.code === code)
+  const sc = codes[idx]
+  const prev = codes[idx - 1] ?? null
+  const next = codes[idx + 1] ?? null
   const accent = accentForCode(code)
 
   useEffect(() => {
@@ -38,7 +45,7 @@ export default function CodeDetailScreen({ code, onBack, onSelectCode }: Props) 
   return (
     <div className="cd-screen">
       <div className="cd-header">
-        <button className="back-btn" onClick={onBack}>← All codes</button>
+        <button className="back-btn" onClick={onBack}>← {CODE_SET_LABELS[codeSet]}</button>
         <div className="cd-nav-btns">
           {prev
             ? <button className="cd-nav-btn" onClick={() => onSelectCode(prev.code)}>← {prev.code}</button>

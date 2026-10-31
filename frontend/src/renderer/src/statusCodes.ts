@@ -611,6 +611,18 @@ export const CUSTOM_HTTP_CODES: StatusCode[] = [
 
 export const ALL_HTTP_CODES: StatusCode[] = [...ALL_CODES, ...UNOFFICIAL_CODES, ...CUSTOM_HTTP_CODES]
 
+export type CodeSet = 'official' | 'unofficial'
+
+export const CODE_SETS: Record<CodeSet, StatusCode[]> = {
+  official: ALL_CODES,
+  unofficial: UNOFFICIAL_CODES,
+}
+
+export const CODE_SET_LABELS: Record<CodeSet, string> = {
+  official: 'Official HTTP Codes',
+  unofficial: 'Unofficial HTTP Codes',
+}
+
 const COMMON_CODE_NUMBERS = new Set([
   200, 201, 202, 204,
   301, 302, 304,

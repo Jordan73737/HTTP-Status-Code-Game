@@ -1,7 +1,8 @@
 import { useReducer, useEffect, useRef, useState } from 'react'
 import { reducer, initialState } from './state'
 import type { Mode } from './state'
-import { isTitleMatch } from './statusCodes'
+import { CODE_SETS, isTitleMatch } from './statusCodes'
+import type { CodeSet } from './statusCodes'
 import { BestTimes, isPerfectRun, loadBestTimes, runKey, saveBestTime } from './timing'
 import StartScreen from './components/StartScreen'
 import GameScreen from './components/GameScreen'
@@ -9,7 +10,10 @@ import ResultsScreen from './components/ResultsScreen'
 import CodesListScreen from './components/CodesListScreen'
 import CodeDetailScreen from './components/CodeDetailScreen'
 
-type InfoView = { screen: 'list' } | { screen: 'detail'; code: number } | null
+type InfoView =
+  | { screen: 'list'; codeSet: CodeSet }
+  | { screen: 'detail'; code: number; codeSet: CodeSet }
+  | null
 
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -114,24 +118,35 @@ export default function App() {
   }
 
   if (state.screen === 'start') {
+    if (infoView?.screen === 'detail') {
+      const codeSet = infoView.codeSet
+      return (
+        <CodeDetailScreen
+          code={infoView.code}
+          codeSet={codeSet}
+          codes={CODE_SETS[codeSet]}
+          onBack={() => setInfoView({ screen: 'list', codeSet })}
+          onSelectCode={code => setInfoView({ screen: 'detail', code, codeSet })}
+        />
+      )
+    }
     if (infoView?.screen === 'list') {
+      const codeSet = infoView.codeSet
       return (
         <CodesListScreen
-          onSelectCode={code => setInfoView({ screen: 'detail', code })}
+          codeSet={codeSet}
+          onSelectSet={nextCodeSet => setInfoView({ screen: 'list', codeSet: nextCodeSet })}
+          onSelectCode={code => setInfoView({ screen: 'detail', code, codeSet })}
           onBack={() => setInfoView(null)}
         />
       )
     }
-    if (infoView?.screen === 'detail') {
-      return (
-        <CodeDetailScreen
-          code={infoView.code}
-          onBack={() => setInfoView({ screen: 'list' })}
-          onSelectCode={code => setInfoView({ screen: 'detail', code })}
-        />
-      )
-    }
-    return <StartScreen onStart={handleStart} onViewCodes={() => setInfoView({ screen: 'list' })} />
+    return (
+      <StartScreen
+        onStart={handleStart}
+        onViewCodes={() => setInfoView({ screen: 'list', codeSet: 'official' })}
+      />
+    )
   }
 
   if (state.screen === 'results') {
