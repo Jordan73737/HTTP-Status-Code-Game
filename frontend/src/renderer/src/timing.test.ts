@@ -88,6 +88,8 @@ describe('best time keys and perfect runs', () => {
   it('separates runs by mode and modifiers', () => {
     const base = { mode: 'common' as const, hardcore: false, alternate: false, timerEnabled: true }
     expect(runKey(base)).not.toBe(runKey({ ...base, mode: 'complete' }))
+    expect(runKey(base)).not.toBe(runKey({ ...base, mode: 'unofficial' }))
+    expect(runKey(base)).not.toBe(runKey({ ...base, mode: 'all' }))
     expect(runKey(base)).not.toBe(runKey({ ...base, hardcore: true }))
     expect(runKey(base)).not.toBe(runKey({ ...base, alternate: true }))
     expect(runKey(base)).not.toBe(runKey({ ...base, timerEnabled: false }))

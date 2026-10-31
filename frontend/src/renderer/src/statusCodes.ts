@@ -390,6 +390,227 @@ export const ALL_CODES: StatusCode[] = [
   },
 ]
 
+export const UNOFFICIAL_CODES: StatusCode[] = [
+  {
+    code: 218, title: 'This is fine',
+    summary: 'Used as a catch-all by some Apache configurations to pass errors through as successful responses for client-side handling.',
+    example: 'An Apache configuration returns an error payload with a successful response status for a client-side script to inspect.',
+    usedFor: 'A configuration-specific success response; not an officially standardized HTTP status.',
+  },
+  {
+    code: 419, title: 'Page Expired',
+    summary: 'Laravel uses this when a CSRF token check fails or the token expires.',
+    example: 'A form is submitted after its CSRF token has expired.',
+    usedFor: 'Laravel applications reporting expired pages or CSRF tokens.',
+  },
+  {
+    code: 420, title: 'Enhance Your Calm',
+    summary: 'Historically used by Twitter for API rate limiting and by Spring when a method fails validation.',
+    example: 'A legacy Twitter API client sends too many requests.',
+    usedFor: 'Legacy Twitter APIs and some Spring applications.',
+  },
+  {
+    code: 430, title: 'Request Header Fields Too Large',
+    summary: 'Shopify repurposes this status to indicate certain API speed limits.',
+    example: 'A Shopify API client reaches a specific request speed limit.',
+    usedFor: 'Shopify-specific API rate limiting.',
+  },
+  {
+    code: 440, title: 'Login Time-out',
+    summary: 'Microsoft IIS uses this when a client web session expires.',
+    example: 'A user tries to continue after their IIS-hosted session has expired.',
+    usedFor: 'Microsoft IIS session timeout reporting.',
+  },
+  {
+    code: 444, title: 'No Response',
+    summary: 'Nginx closes the connection without sending response headers.',
+    example: 'An Nginx server closes a connection without returning an HTTP response.',
+    usedFor: 'Nginx-specific connection handling.',
+  },
+  {
+    code: 449, title: 'Retry With',
+    summary: 'Microsoft IIS uses this when a request lacks required parameters and should be retried with more information.',
+    example: 'A client retries an IIS request after adding required parameters.',
+    usedFor: 'Microsoft IIS-specific request handling.',
+  },
+  {
+    code: 450, title: 'Blocked by Windows Parental Controls',
+    summary: 'Microsoft uses this when a requested page is blocked by local family safety settings.',
+    example: 'A Windows family-safety policy blocks a webpage.',
+    usedFor: 'Microsoft-specific parental control reporting.',
+  },
+  {
+    code: 460, title: 'Client Closed Connection',
+    summary: 'AWS ELB uses this when the client disconnects before the load balancer idle timeout.',
+    example: 'A client closes its connection while an AWS load balancer is waiting.',
+    usedFor: 'AWS Elastic Load Balancing connection logging.',
+  },
+  {
+    code: 463, title: 'Too Many Forwarded IP Addresses',
+    summary: 'AWS ELB uses this when an X-Forwarded-For header contains more than 30 IP addresses.',
+    example: 'A request arrives with an X-Forwarded-For chain longer than 30 addresses.',
+    usedFor: 'AWS Elastic Load Balancing request reporting.',
+  },
+  {
+    code: 494, title: 'Request Header Too Large',
+    summary: 'Nginx uses this when a client request header exceeds its configured memory bounds.',
+    example: 'A client sends request headers that exceed Nginx limits.',
+    usedFor: 'Nginx-specific request header reporting.',
+  },
+  {
+    code: 495, title: 'SSL Certificate Error',
+    summary: 'Nginx uses this when client-side certificate validation fails.',
+    example: 'A client presents an invalid certificate during TLS negotiation.',
+    usedFor: 'Nginx-specific client certificate reporting.',
+  },
+  {
+    code: 496, title: 'SSL Certificate Required',
+    summary: 'Nginx uses this when a client certificate is required but omitted.',
+    example: 'A client connects to a server requiring mutual TLS but sends no certificate.',
+    usedFor: 'Nginx-specific client certificate reporting.',
+  },
+  {
+    code: 497, title: 'HTTP Request Sent to HTTPS Port',
+    summary: 'Nginx uses this when a plaintext HTTP request is sent to a port expecting HTTPS.',
+    example: 'A client sends an unencrypted request to an HTTPS endpoint.',
+    usedFor: 'Nginx-specific protocol mismatch reporting.',
+  },
+  {
+    code: 498, title: 'Invalid Token',
+    summary: 'Esri ArcGIS uses this for proprietary token validation failures.',
+    example: 'An ArcGIS request includes an invalid authentication token.',
+    usedFor: 'Esri ArcGIS token validation.',
+  },
+  {
+    code: 499, title: 'Client Closed Request',
+    altTitles: ['Required Token'],
+    summary: 'Nginx logs this when a client closes a connection before the server finishes computing the response; Esri also uses it for a required-token condition.',
+    example: 'A client disconnects while Nginx is still processing the request.',
+    usedFor: 'Nginx request logging and an Esri proprietary token condition.',
+  },
+  {
+    code: 509, title: 'Bandwidth Limit Exceeded',
+    summary: 'Apache and cPanel use this when a shared hosting account reaches its monthly data cap.',
+    example: 'A hosted site exceeds its allocated monthly bandwidth.',
+    usedFor: 'Shared hosting bandwidth limit reporting.',
+  },
+  {
+    code: 520, title: 'Web Server Returned an Unknown Error',
+    summary: 'Cloudflare uses this when an origin sends an unexpected or empty response.',
+    example: 'A Cloudflare origin response contains unexpected or blank headers.',
+    usedFor: 'Cloudflare origin error reporting.',
+  },
+  {
+    code: 521, title: 'Web Server Is Down',
+    summary: 'Cloudflare uses this when the origin server refuses a connection.',
+    example: 'A Cloudflare edge cannot establish a connection because the origin refuses it.',
+    usedFor: 'Cloudflare origin connection reporting.',
+  },
+  {
+    code: 522, title: 'Connection Timed Out',
+    summary: 'Cloudflare uses this when the TCP handshake with the origin times out.',
+    example: 'A Cloudflare edge cannot complete the TCP handshake with its origin in time.',
+    usedFor: 'Cloudflare origin connection timeout reporting.',
+  },
+  {
+    code: 523, title: 'Origin Is Unreachable',
+    summary: 'Cloudflare uses this when the origin cannot be reached because of DNS routing or a network path problem.',
+    example: 'A Cloudflare edge has no working network route to its origin.',
+    usedFor: 'Cloudflare origin reachability reporting.',
+  },
+  {
+    code: 524, title: 'A Timeout Occurred',
+    summary: 'Cloudflare uses this when it connects to the origin but the origin takes too long to respond.',
+    example: 'The origin accepts a connection but does not produce its response before Cloudflare times out.',
+    usedFor: 'Cloudflare origin response timeout reporting.',
+  },
+  {
+    code: 525, title: 'SSL Handshake Failed',
+    summary: 'Cloudflare uses this when the TLS handshake between its edge and the origin fails.',
+    example: 'A Cloudflare edge cannot complete TLS negotiation with its origin.',
+    usedFor: 'Cloudflare origin TLS reporting.',
+  },
+  {
+    code: 526, title: 'Invalid SSL Certificate',
+    summary: 'Cloudflare uses this when the origin certificate is untrusted, expired, or self-signed.',
+    example: 'Cloudflare rejects an origin certificate that it cannot validate.',
+    usedFor: 'Cloudflare origin certificate reporting.',
+  },
+  {
+    code: 527, title: 'Railgun Error',
+    summary: 'Cloudflare uses this for a timeout inside a WAN optimization proxy tunnel.',
+    example: 'A request times out while passing through a Railgun tunnel.',
+    usedFor: 'Cloudflare Railgun error reporting.',
+  },
+  {
+    code: 529, title: 'Site Is Overloaded',
+    summary: 'Qualys and Apple use this when a server drops incoming traffic to avoid overloading.',
+    example: 'A service rejects incoming traffic while overloaded.',
+    usedFor: 'Service-specific overload reporting.',
+  },
+  {
+    code: 530, title: 'Site Is Frozen',
+    summary: 'Pantheon and Shopify use this when a site is locked due to billing, suspension, or inactivity.',
+    example: 'A suspended or inactive hosted site stops serving requests.',
+    usedFor: 'Hosting-provider site suspension reporting.',
+  },
+  {
+    code: 561, title: 'Unauthorized',
+    summary: 'AWS ELB uses this when an identity provider authentication check fails on a listener rule.',
+    example: 'An AWS load balancer denies a request after its identity provider check fails.',
+    usedFor: 'AWS Elastic Load Balancing authentication reporting.',
+  },
+  {
+    code: 598, title: 'Network Read Timeout Error',
+    summary: 'Some legacy proxies use this when they cannot read downstream response data in time.',
+    example: 'A proxy times out while reading a downstream response stream.',
+    usedFor: 'Legacy proxy network read timeout reporting.',
+  },
+  {
+    code: 599, title: 'Network Connect Timeout Error',
+    summary: 'Some legacy proxies use this when they time out trying to establish a downstream connection.',
+    example: 'A proxy cannot establish its downstream connection before timing out.',
+    usedFor: 'Legacy proxy connection timeout reporting.',
+  },
+  {
+    code: 701, title: 'Meh',
+    altTitles: ['Error Text Found'],
+    summary: 'A joke-style custom framework status for uninterested input; another supplied name is Error Text Found.',
+    example: 'A custom framework uses this to indicate it is not interested in the input.',
+    usedFor: 'Custom internal or framework-specific behavior.',
+  },
+  {
+    code: 707, title: 'Hacker Detected',
+    summary: 'Custom firewalls may use this to flag suspicious request signatures.',
+    example: 'A custom firewall labels a request as suspicious.',
+    usedFor: 'Custom internal firewall reporting.',
+  },
+  {
+    code: 999, title: 'Request Denied',
+    altTitles: ['LinkedIn Request Denial', 'LinkedIn Request Denial Anti-Scraping'],
+    summary: 'LinkedIn uses this to deny automated scraping requests without an API key.',
+    example: 'An automated request to read LinkedIn profiles is denied.',
+    usedFor: 'LinkedIn-specific anti-scraping behavior.',
+  },
+]
+
+export const CUSTOM_HTTP_CODES: StatusCode[] = [
+  {
+    code: 600, title: 'Connection Error',
+    summary: 'A custom internal status code example; its precise meaning depends on the system that defines it.',
+    example: 'An internal service uses 600 to represent a connection error.',
+    usedFor: 'Custom internal connection error reporting.',
+  },
+  {
+    code: 893, title: 'Load Balance Overflow',
+    summary: 'A custom internal status code example; its precise meaning depends on the system that defines it.',
+    example: 'An internal load balancer uses 893 to report overflow.',
+    usedFor: 'Custom internal load-balancer reporting.',
+  },
+]
+
+export const ALL_HTTP_CODES: StatusCode[] = [...ALL_CODES, ...UNOFFICIAL_CODES, ...CUSTOM_HTTP_CODES]
+
 const COMMON_CODE_NUMBERS = new Set([
   200, 201, 202, 204,
   301, 302, 304,

@@ -1,4 +1,5 @@
 import { useRef, useEffect, KeyboardEvent } from 'react'
+import { modeLabel } from '../state'
 import type { AppState } from '../state'
 import { ROUND_TIME_LIMIT, HARDCORE_TIMED_DEFAULT } from '../state'
 import { formatDuration } from '../timing'
@@ -93,7 +94,7 @@ export default function GameScreen({
           <h2 className="game-title">HTTP Status Code Quiz!</h2>
           <div className="game-badges">
             <span className="badge badge--mode">
-              {state.mode === 'common' ? 'Common' : 'Complete'}
+              {modeLabel(state.mode)}
             </span>
             {state.hardcore && <span className="badge badge--hardcore">Hardcore</span>}
             {state.alternate && <span className="badge badge--alternate">Alternate</span>}
@@ -153,7 +154,7 @@ export default function GameScreen({
       {/* ── Right panel: mode-specific compact grid ── */}
       <div className="game-right">
         <h3 className="table-heading">
-          {state.mode === 'common' ? 'Common' : 'Complete'} codes
+          {modeLabel(state.mode)} codes
           <span className="table-heading-count"> — {state.guessed.size}/{state.codes.length} guessed</span>
         </h3>
         <div className="codes-grid">

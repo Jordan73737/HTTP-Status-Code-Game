@@ -1,5 +1,6 @@
 import { useReducer, useEffect, useRef, useState } from 'react'
 import { reducer, initialState } from './state'
+import type { Mode } from './state'
 import { isTitleMatch } from './statusCodes'
 import { BestTimes, isPerfectRun, loadBestTimes, runKey, saveBestTime } from './timing'
 import StartScreen from './components/StartScreen'
@@ -99,7 +100,7 @@ export default function App() {
   }
 
   const handleStart = (
-    mode: 'common' | 'complete',
+    mode: Mode,
     timerEnabled: boolean,
     customSeconds?: number,
     hardcore?: boolean,

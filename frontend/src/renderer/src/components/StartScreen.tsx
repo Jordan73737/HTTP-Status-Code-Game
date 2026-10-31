@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { modeLabel, ROUND_TIME_LIMIT, HARDCORE_TIMED_DEFAULT } from '../state'
 import type { Mode } from '../state'
-import { ROUND_TIME_LIMIT, HARDCORE_TIMED_DEFAULT } from '../state'
-import { COMMON_CODES, ALL_CODES } from '../statusCodes'
+import { COMMON_CODES, ALL_CODES, UNOFFICIAL_CODES, ALL_HTTP_CODES } from '../statusCodes'
 
 interface Props {
   onStart: (mode: Mode, timerEnabled: boolean, customSeconds?: number, hardcore?: boolean, alternate?: boolean) => void
@@ -11,6 +11,12 @@ interface Props {
 // Ignore Escape-to-quit for a short window after mount so a trailing keydown
 // left over from backing out of a quiz can't immediately quit the app.
 const QUIT_GUARD_MS = 500
+const MODE_OPTIONS: { mode: Mode; count: number }[] = [
+  { mode: 'common', count: COMMON_CODES.length },
+  { mode: 'complete', count: ALL_CODES.length },
+  { mode: 'unofficial', count: UNOFFICIAL_CODES.length },
+  { mode: 'all', count: ALL_HTTP_CODES.length },
+]
 
 export default function StartScreen({ onStart, onViewCodes }: Props) {
   const [selectedMode, setSelectedMode] = useState<Mode | null>(null)
@@ -141,41 +147,46 @@ export default function StartScreen({ onStart, onViewCodes }: Props) {
                 <p className="timer-note">
                   Default: {hardcore
                     ? <><strong>Hardcore</strong> {HARDCORE_TIMED_DEFAULT}s</>
-                    : <><strong>Common</strong> {ROUND_TIME_LIMIT.common}s · <strong>Complete</strong> {ROUND_TIME_LIMIT.complete}s</>}
+                    : <>Defaults: {MODE_OPTIONS.map(({ mode }, index) => (
+                      <span key={mode}>
+                        {index > 0 && ' · '}
+                        <strong>{modeLabel(mode)}</strong> {ROUND_TIME_LIMIT[mode]}s
+                      </span>
+                    ))}</>}
                 </p>
               )}
             </div>
 
             <button className="start-quiz-btn" onClick={handleConfirmStart}>
-              Start {selectedMode === 'common' ? 'Common' : 'Complete'}{hardcore ? ' Hardcore' : ''}{alternate ? ' Alternate' : ''} Quiz →
+              Start {modeLabel(selectedMode)}{hardcore ? ' Hardcore' : ''}{alternate ? ' Alternate' : ''} Quiz →
             </button>
           </div>
         )}
 
         <div className="mode-grid">
-          <button
-            className={`mode-card${selectedMode === 'common' ? ' mode-card--selected' : ''}`}
-            onClick={() => handleSelectMode('common')}
-          >
-            <div className="mode-card-label">Common Codes</div>
-            <div className="mode-card-count">{COMMON_CODES.length} codes</div>
-            <div className="mode-card-timer">Default: {ROUND_TIME_LIMIT.common}s</div>
-          </button>
-          <button
-            className={`mode-card${selectedMode === 'complete' ? ' mode-card--selected' : ''}`}
-            onClick={() => handleSelectMode('complete')}
-          >
-            <div className="mode-card-label">Complete List</div>
-            <div className="mode-card-count">{ALL_CODES.length} codes</div>
-            <div className="mode-card-timer">Default: {ROUND_TIME_LIMIT.complete}s</div>
-          </button>
+          {MODE_OPTIONS.map(({ mode, count }) => (
+            <button
+              key={mode}
+              className={`mode-card${selectedMode === mode ? ' mode-card--selected' : ''}`}
+              onClick={() => handleSelectMode(mode)}
+            >
+              <div className="mode-card-label">{modeLabel(mode)}</div>
+              <div className="mode-card-count">{count} codes</div>
+              <div className="mode-card-timer">Default: {ROUND_TIME_LIMIT[mode]}s</div>
+            </button>
+          ))}
         </div>
+        {selectedMode === 'all' && (
+          <p className="timer-note">
+            All HTTP Codes combines the official list, supplied unofficial codes, and custom examples. It is not exhaustive.
+          </p>
+        )}
         <button className="codes-ref-btn" onClick={onViewCodes}>
           HTTP Codes Revision →
         </button>
         <p className="start-hint">
           {selectedMode
-            ? <>Press <kbd>Enter</kbd> to start {selectedMode === 'common' ? 'Common' : 'Complete'} · <kbd>Esc</kbd> to go back</>
+            ? <>Press <kbd>Enter</kbd> to start {modeLabel(selectedMode)} · <kbd>Esc</kbd> to go back</>
             : <>Select a quiz mode to continue · <kbd>Esc</kbd> to quit</>}
         </p>
       </div>

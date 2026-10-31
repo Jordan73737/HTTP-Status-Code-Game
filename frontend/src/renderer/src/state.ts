@@ -1,15 +1,34 @@
-import { COMMON_CODES, ALL_CODES, shuffleStatusCodes, isTitleMatch, StatusCode } from './statusCodes'
+import {
+  COMMON_CODES,
+  ALL_CODES,
+  UNOFFICIAL_CODES,
+  ALL_HTTP_CODES,
+  shuffleStatusCodes,
+  isTitleMatch,
+  StatusCode,
+} from './statusCodes'
 
 export type Screen = 'start' | 'game' | 'results'
-export type Mode = 'common' | 'complete'
+export type Mode = 'common' | 'complete' | 'unofficial' | 'all'
+
+export function modeLabel(mode: Mode): string {
+  switch (mode) {
+    case 'common': return 'Common HTTP Codes'
+    case 'complete': return 'Official HTTP Codes'
+    case 'unofficial': return 'Unofficial HTTP Codes'
+    case 'all': return 'All HTTP Codes'
+  }
+}
 
 /** Total countdown (in seconds) allowed to answer every question in a mode */
 export const ROUND_TIME_LIMIT: Record<Mode, number> = {
   common: 60,
   complete: 180,
+  unofficial: 180,
+  all: 300,
 }
 
-/** Default countdown (in seconds) for Hardcore Timed, independent of the Common/Complete code list chosen. */
+/** Default countdown (in seconds) for Hardcore Timed, independent of the code list chosen. */
 export const HARDCORE_TIMED_DEFAULT = 180
 
 export interface AppState {
@@ -65,7 +84,13 @@ export type Action =
 export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
     case 'START': {
-      const baseCodes = action.mode === 'common' ? COMMON_CODES : ALL_CODES
+      const baseCodes = action.mode === 'common'
+        ? COMMON_CODES
+        : action.mode === 'complete'
+        ? ALL_CODES
+        : action.mode === 'unofficial'
+        ? UNOFFICIAL_CODES
+        : ALL_HTTP_CODES
       const codes = shuffleStatusCodes(baseCodes)
       const hardcore = action.hardcore ?? false
       const alternate = action.alternate ?? false

@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { reducer, initialState } from './state'
-import { ALL_CODES, COMMON_CODES, isTitleMatch, shuffleStatusCodes } from './statusCodes'
+import {
+  ALL_CODES,
+  ALL_HTTP_CODES,
+  COMMON_CODES,
+  CUSTOM_HTTP_CODES,
+  UNOFFICIAL_CODES,
+  isTitleMatch,
+  shuffleStatusCodes,
+} from './statusCodes'
 
 describe('shuffleStatusCodes', () => {
   it('randomizes the short quiz order instead of keeping the static array sequence', () => {
@@ -21,6 +29,28 @@ describe('round timer rules', () => {
     expect(common.timerEnabled).toBe(true)
     expect(complete.timeLeft).toBe(180)
     expect(complete.timerEnabled).toBe(true)
+  })
+
+  it('starts Unofficial and All modes with their corresponding code sets', () => {
+    const unofficial = reducer(initialState, { type: 'START', mode: 'unofficial' })
+    const all = reducer(initialState, { type: 'START', mode: 'all' })
+
+    expect(unofficial.codes).toHaveLength(UNOFFICIAL_CODES.length)
+    expect(unofficial.codes.map(code => code.code).sort()).toEqual(UNOFFICIAL_CODES.map(code => code.code).sort())
+    expect(all.codes).toHaveLength(ALL_HTTP_CODES.length)
+    expect(all.codes.map(code => code.code).sort()).toEqual(ALL_HTTP_CODES.map(code => code.code).sort())
+    expect(unofficial.timeLeft).toBe(180)
+    expect(all.timeLeft).toBe(300)
+  })
+
+  it('combines official, supplied unofficial, and custom entries without duplicate codes', () => {
+    const codes = ALL_HTTP_CODES.map(code => code.code)
+    expect(UNOFFICIAL_CODES).toHaveLength(33)
+    expect(CUSTOM_HTTP_CODES.map(code => code.code)).toEqual([600, 893])
+    expect(new Set(codes).size).toBe(codes.length)
+    expect(codes).toContain(701)
+    expect(codes).toContain(707)
+    expect(codes).toContain(999)
   })
 
   it('supports disabling the timer and pausing the round', () => {
